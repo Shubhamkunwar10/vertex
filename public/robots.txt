@@ -1,3 +1,10 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# It's good practice to disallow search indexing of specific, non-public paths if any exist.
+# For example, if you have an admin login page:
+# Disallow: /admin
+
+# Point search engines to your sitemap for efficient crawling
+Sitemap: https://vertex-three-eta.vercel.app/sitemap.xml
