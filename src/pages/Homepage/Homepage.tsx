@@ -354,9 +354,8 @@ const ResponsiveFrame: React.FC<ResponsiveFrameProps> = ({ files, backgroundImag
         >
           <div className="w-full h-full rounded-2xl overflow-hidden relative bg-black">
             <SandpackLayout className="!rounded-2xl">
-              {/* ⭐️ START MODIFICATION: Pass prop down ⭐️ */}
+              {/* ✅ CORRECT: Use relative height to fill the parent container */}
               <PreviewWithLoader style={{ height: "80vh" }} backgroundImageUrl={backgroundImageUrl}/>
-              {/* ⭐️ END MODIFICATION ⭐️ */}
             </SandpackLayout>
           </div>
           <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-full" />
@@ -366,9 +365,8 @@ const ResponsiveFrame: React.FC<ResponsiveFrameProps> = ({ files, backgroundImag
         <div className="hidden sm:block relative w-full h-full bg-gradient-to-br from-white/10 to-black/10 backdrop-blur-sm rounded-3xl shadow-2xl p-3 border border-white/10">
           <div className="w-full h-full rounded-2xl overflow-hidden relative bg-black/30">
             <SandpackLayout className="!rounded-2xl">
-              {/* ⭐️ START MODIFICATION: Pass prop down ⭐️ */}
+              {/* ✅ CORRECT: Use relative height here too for consistency */}
               <PreviewWithLoader style={{ height: "80vh" }} backgroundImageUrl={backgroundImageUrl}/>
-              {/* ⭐️ END MODIFICATION ⭐️ */}
             </SandpackLayout>
           </div>
         </div>
