@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantum Leap Digital - Propelling Your Business Forward</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                brand: {
+                  light: '#22d3ee', // cyan-400
+                  DEFAULT: '#06b6d4', // cyan-500
+                  dark: '#0891b2' // cyan-600
+                },
+                secondary: '#3b82f6', // blue-500
+                background: {
+                  light: '#f8fafc', // slate-50
+                  DEFAULT: '#030712', // gray-950
+                  dark: '#111827' // gray-900
+                }
+              },
+              animation: {
+                'infinite-scroll': 'infinite-scroll 25s linear infinite',
+              },
+              keyframes: {
+                'infinite-scroll': {
+                  from: { transform: 'translateX(0)' },
+                  to: { transform: 'translateX(-100%)' },
+                }
+              }
+            }
+          }
+        }
+    </script>
+
+    <!-- Google Fonts: Orbitron & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .smooth-transition { @apply transition-all duration-300 ease-in-out; }
+        .section-title { @apply text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl; }
+        .section-subtitle { @apply mt-4 text-lg leading-8 text-gray-600 dark:text-gray-400; }
+        
+        /* Styles for Scroll Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Styles for the social menu */
+        #social-menu {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #social-menu .social-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        #social-menu.active .social-icon-up { transform: translate(-50%, -7rem) scale(1); }
+        #social-menu.active .social-icon-right { transform: translate(6rem, -50%) scale(1); }
+        #social-menu.active .social-icon-down { transform: translate(-50%, 6rem) scale(1); }
+        #social-menu.active .social-icon-left { transform: translate(-6rem, -50%) scale(1); }
+        #social-menu .central-logo, #social-menu #close-social-menu {
+            transform: scale(0);
+            transition: transform 0.3s ease-out;
+        }
+        #social-menu.active .central-logo, #social-menu.active #close-social-menu {
+            transform: scale(1);
+        }
+        #social-menu.active #close-social-menu {
+            transition-delay: 0.2s;
+        }
+        
+        /* Styles for Gemini Modal */
+        #gemini-modal-backdrop.hidden, #gemini-modal.hidden { display: none; }
+        #audit-modal-backdrop.hidden, #audit-modal.hidden { display: none; }
+
+
+        /* Styles for Team Card Hover Effect */
+        .team-card-glow::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(from 90deg at 40% 50%, #06b6d4, #3b82f6, #06b6d4);
+            filter: blur(10px);
+            transform: scale(0.95);
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            z-index: -1;
+        }
+        .group:hover .team-card-glow::before {
+            opacity: 0.7;
+            transform: scale(1);
+        }
+    </style>
+    
+</head>
+<body class="bg-background-light dark:bg-background text-gray-800 dark:text-gray-300">
+
+    <!-- HEADER -->
+    <header class="bg-white/80 dark:bg-background/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-2xl font-orbitron font-bold text-gray-900 dark:text-white">
+                        Quantum<span class="text-brand">Leap</span>
+                    </a>
+                </div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#services" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Services</a>
+                    <a href="#philosophy" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Philosophy</a>
+                    <a href="#audit" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Audit</a>
+                    <a href="#team" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Team</a>
+                    <a href="#testimonials" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Testimonials</a>
+                    <a href="#faq" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">FAQ</a>
+                    <a href="#contact" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Contact</a>
+                </nav>
+                 <div class="flex items-center">
+                    <button id="theme-toggle" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand smooth-transition">
+                        <!-- Sun/Moon Icon here -->
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section id="home" class="relative isolate overflow-hidden pt-24 pb-32 sm:pt-32 sm:pb-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="font-orbitron text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl reveal">Propelling Your Business into the Future</h1>
+                <p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto reveal" style="transition-delay: 0.2s;">We leverage AI and data-driven strategies to create next-generation digital solutions that deliver unparalleled results.</p>
+                <div class="mt-10 reveal" style="transition-delay: 0.4s;">
+                    <a href="#contact" class="rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand smooth-transition">Launch Your Project</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- OUR SERVICES -->
+        <section id="services" class="py-24 sm:py-32 bg-gray-100 dark:bg-background-dark">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="section-title font-orbitron">Our Digital Arsenal</h2>
+                    <p class="section-subtitle">Cutting-edge services to redefine your market presence.</p>
+                </div>
+                <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <div class="reveal p-8 bg-white dark:bg-background rounded-lg border border-gray-200 dark:border-gray-800">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">AI-Powered Analytics</h3>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">Unlock deep insights from your data to predict trends and personalize customer experiences.</p>
+                    </div>
+                    <div class="reveal p-8 bg-white dark:bg-background rounded-lg border border-gray-200 dark:border-gray-800" style="transition-delay: 0.2s;">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Quantum Web Development</h3>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">Blazingly fast, secure, and intelligent websites built on next-generation architecture.</p>
+                    </div>
+                    <div class="reveal p-8 bg-white dark:bg-background rounded-lg border border-gray-200 dark:border-gray-800" style="transition-delay: 0.4s;">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Algorithmic Branding</h3>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">Create a powerful brand identity that resonates with your target audience on a cognitive level.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OUR PHILOSOPHY -->
+        <section id="philosophy" class="py-24 sm:py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="section-title font-orbitron">The Quantum Approach</h2>
+                    <p class="section-subtitle">Our core principles for revolutionary results.</p>
+                </div>
+                <div class="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                    <div class="text-center reveal">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-brand/10 text-brand mx-auto">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+                        </div>
+                        <h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">Data-First Innovation</h3>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">Every decision is backed by data, ensuring precision and eliminating guesswork.</p>
+                    </div>
+                    <div class="text-center reveal" style="transition-delay: 0.2s;">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-brand/10 text-brand mx-auto">
+                           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
+                        </div>
+                        <h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">Human-Centric AI</h3>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">We build intelligent systems that feel intuitive, personal, and genuinely helpful.</p>
+                    </div>
+                    <div class="text-center reveal" style="transition-delay: 0.4s;">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-brand/10 text-brand mx-auto">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a12.022 12.022 0 01-12 0m12 0a12.022 12.022 0 00-12 0m12 0a6 6 0 00-5.84-7.38v4.82m5.84 2.56a12.022 12.022 0 01-12 0" /></svg>
+                        </div>
+                        <h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">Sustainable Growth</h3>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">Our solutions are built to scale, adapt, and drive long-term success.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AI AUDIT SECTION -->
+        <section id="audit" class="py-24 sm:py-32 bg-gray-100 dark:bg-background-dark">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="section-title font-orbitron">Future-Proof Audit</h2>
+                    <p class="section-subtitle">Let our AI analyze your business for untapped digital potential.</p>
+                </div>
+                <div class="mt-12 reveal">
+                    <div class="bg-white dark:bg-background p-8 rounded-lg border border-gray-200 dark:border-gray-800">
+                        <label for="audit-desc" class="block text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300">Describe your business:</label>
+                        <textarea id="audit-desc" rows="4" class="mt-2 block w-full rounded-md border-0 py-2 px-3.5 bg-gray-100 dark:bg-gray-900/50 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6" placeholder="e.g., We are a boutique hotel in a historic city, focused on providing a luxury experience for tourists."></textarea>
+                        <button id="run-audit-btn" class="mt-6 w-full sm:w-auto rounded-md bg-secondary px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary smooth-transition">✨ Run AI Audit</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OUR TEAM -->
+        <section id="team" class="py-24 sm:py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="section-title font-orbitron">Meet the Architects of Tomorrow</h2>
+                    <p class="section-subtitle">The innovators driving our mission forward.</p>
+                </div>
+                <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <div class="group relative overflow-hidden rounded-lg reveal">
+                        <div class="team-card-glow"></div>
+                        <img class="h-96 w-full object-cover smooth-transition group-hover:scale-105" src="https://i.pravatar.cc/400?img=1" alt="Aria Vance">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-x-0 bottom-0 p-6">
+                            <div class="transform transition-all duration-500 ease-in-out group-hover:-translate-y-16">
+                                <h3 class="text-xl font-semibold text-white">Aria Vance</h3>
+                                <p class="text-sm text-brand">Founder & AI Strategist</p>
+                            </div>
+                            <div class="absolute -bottom-full left-0 w-full p-6 opacity-0 transition-all duration-500 ease-in-out group-hover:bottom-0 group-hover:opacity-100">
+                                <p class="text-sm text-gray-300 mb-4">Aria pioneers AI-driven strategies that redefine industry boundaries.</p>
+                                <div class="flex space-x-4">
+                                    <a href="#" class="text-gray-400 hover:text-brand"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>
+                                    <a href="#" class="text-gray-400 hover:text-brand"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 0.2s;">
+                        <div class="team-card-glow"></div>
+                        <img class="h-96 w-full object-cover smooth-transition group-hover:scale-105" src="https://i.pravatar.cc/400?img=2" alt="Jaxon Grey">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-x-0 bottom-0 p-6">
+                            <div class="transform transition-all duration-500 ease-in-out group-hover:-translate-y-16">
+                                <h3 class="text-xl font-semibold text-white">Jaxon Grey</h3>
+                                <p class="text-sm text-secondary">Lead Data Scientist</p>
+                            </div>
+                            <div class="absolute -bottom-full left-0 w-full p-6 opacity-0 transition-all duration-500 ease-in-out group-hover:bottom-0 group-hover:opacity-100">
+                                <p class="text-sm text-gray-300 mb-4">Jaxon translates complex data into actionable, game-changing insights.</p>
+                                <div class="flex space-x-4">
+                                    <a href="#" class="text-gray-400 hover:text-secondary"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>
+                                    <a href="#" class="text-gray-400 hover:text-secondary"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 0.4s;">
+                        <div class="team-card-glow"></div>
+                        <img class="h-96 w-full object-cover smooth-transition group-hover:scale-105" src="https://i.pravatar.cc/400?img=3" alt="Lena Sterling">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                        <div class="absolute inset-x-0 bottom-0 p-6">
+                            <div class="transform transition-all duration-500 ease-in-out group-hover:-translate-y-16">
+                                <h3 class="text-xl font-semibold text-white">Lena Sterling</h3>
+                                <p class="text-sm text-gray-400">Quantum Interface Designer</p>
+                            </div>
+                            <div class="absolute -bottom-full left-0 w-full p-6 opacity-0 transition-all duration-500 ease-in-out group-hover:bottom-0 group-hover:opacity-100">
+                                <p class="text-sm text-gray-300 mb-4">Lena designs intuitive and beautiful interfaces for complex systems.</p>
+                                <div class="flex space-x-4">
+                                    <a href="#" class="text-gray-400 hover:text-white"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>
+                                    <a href="#" class="text-gray-400 hover:text-white"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS -->
+        <section id="testimonials" class="py-24 sm:py-32 bg-gray-100 dark:bg-background-dark">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="section-title font-orbitron">What Our Customers Say</h2>
+                    <p class="section-subtitle">Transmissions from Our Partners</p>
+                </div>
+                <div class="mt-16 w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
+                    <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll hover:[animation-play-state:paused]">
+                        <li>
+                            <div class="bg-white dark:bg-background p-6 rounded-lg shadow-md w-80">
+                                <div class="flex items-center mb-4">
+                                    <img class="w-12 h-12 rounded-full mr-4" src="https://i.pravatar.cc/48?img=4" alt="Kaelen Rhys">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Kaelen Rhys</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">CEO, Nebula Dynamics</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 italic">"Their insights are simply unparalleled. Our growth has been exponential."</p>
+                            </div>
+                        </li>
+                        <li>
+                           <div class="bg-white dark:bg-background p-6 rounded-lg shadow-md w-80">
+                                <div class="flex items-center mb-4">
+                                    <img class="w-12 h-12 rounded-full mr-4" src="https://i.pravatar.cc/48?img=5" alt="Sloane Decker">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Sloane Decker</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">CTO, Hyperion Labs</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 italic">"Quantum Leap delivered a solution that was not only powerful but beautiful."</p>
+                            </div>
+                        </li>
+                        <li>
+                           <div class="bg-white dark:bg-background p-6 rounded-lg shadow-md w-80">
+                                <div class="flex items-center mb-4">
+                                    <img class="w-12 h-12 rounded-full mr-4" src="https://i.pravatar.cc/48?img=6" alt="Ronan Finch">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Ronan Finch</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Founder, Orbit Ventures</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 italic">"A true partner in innovation. They took our vision and made it a reality."</p>
+                            </div>
+                        </li>
+                         <li>
+                           <div class="bg-white dark:bg-background p-6 rounded-lg shadow-md w-80">
+                                <div class="flex items-center mb-4">
+                                    <img class="w-12 h-12 rounded-full mr-4" src="https://i.pravatar.cc/48?img=7" alt="Elara Thorne">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Elara Thorne</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Marketing Head, Starlight Inc.</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 italic">"The results speak for themselves. We've never seen engagement like this."</p>
+                            </div>
+                        </li>
+                    </ul>
+                     <ul class="flex items-center justify-center md:justify-start [&_li]:mx-8 [&_img]:max-w-none animate-infinite-scroll hover:[animation-play-state:paused]" aria-hidden="true">
+                        <li>
+                            <div class="bg-white dark:bg-background p-6 rounded-lg shadow-md w-80">
+                                <div class="flex items-center mb-4">
+                                    <img class="w-12 h-12 rounded-full mr-4" src="https://i.pravatar.cc/48?img=4" alt="Kaelen Rhys">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Kaelen Rhys</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">CEO, Nebula Dynamics</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 italic">"Their insights are simply unparalleled. Our growth has been exponential."</p>
+                            </div>
+                        </li>
+                        <li>
+                           <div class="bg-white dark:bg-background p-6 rounded-lg shadow-md w-80">
+                                <div class="flex items-center mb-4">
+                                    <img class="w-12 h-12 rounded-full mr-4" src="https://i.pravatar.cc/48?img=5" alt="Sloane Decker">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Sloane Decker</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">CTO, Hyperion Labs</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 italic">"Quantum Leap delivered a solution that was not only powerful but beautiful."</p>
+                            </div>
+                        </li>
+                        <li>
+                           <div class="bg-white dark:bg-background p-6 rounded-lg shadow-md w-80">
+                                <div class="flex items-center mb-4">
+                                    <img class="w-12 h-12 rounded-full mr-4" src="https://i.pravatar.cc/48?img=6" alt="Ronan Finch">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Ronan Finch</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Founder, Orbit Ventures</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 italic">"A true partner in innovation. They took our vision and made it a reality."</p>
+                            </div>
+                        </li>
+                         <li>
+                           <div class="bg-white dark:bg-background p-6 rounded-lg shadow-md w-80">
+                                <div class="flex items-center mb-4">
+                                    <img class="w-12 h-12 rounded-full mr-4" src="https://i.pravatar.cc/48?img=7" alt="Elara Thorne">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Elara Thorne</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Marketing Head, Starlight Inc.</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 italic">"The results speak for themselves. We've never seen engagement like this."</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="py-24 sm:py-32">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="section-title font-orbitron">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Declassifying our operational parameters.</p>
+                </div>
+                <div class="mt-12 space-y-4 reveal" id="faq-container">
+                    <!-- FAQ items will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT US -->
+        <section id="contact" class="py-24 sm:py-32 bg-gray-100 dark:bg-background-dark">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="section-title font-orbitron">Initiate Contact</h2>
+                    <p class="section-subtitle">Ready for a quantum leap? Send us a transmission.</p>
+                </div>
+                <div id="contact-form-container" class="mt-16 reveal">
+                    <form id="contact-form" novalidate>
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2">
+                            <div>
+                                <label for="first-name" class="block text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300">First name</label>
+                                <div class="mt-2.5">
+                                    <input type="text" name="first-name" id="first-name" required class="block w-full rounded-md border-0 py-2 px-3.5 bg-white dark:bg-background text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6">
+                                    <p class="error-message mt-1 text-pink-500 text-xs hidden">First name is required.</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="last-name" class="block text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300">Last name</label>
+                                <div class="mt-2.5">
+                                    <input type="text" name="last-name" id="last-name" required class="block w-full rounded-md border-0 py-2 px-3.5 bg-white dark:bg-background text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6">
+                                    <p class="error-message mt-1 text-pink-500 text-xs hidden">Last name is required.</p>
+                                </div>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label for="email" class="block text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300">Email</label>
+                                <div class="mt-2.5">
+                                    <input type="email" name="email" id="email" required class="block w-full rounded-md border-0 py-2 px-3.5 bg-white dark:bg-background text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6">
+                                    <p class="error-message mt-1 text-pink-500 text-xs hidden">Please enter a valid email address.</p>
+                                </div>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label for="message" class="block text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300">Message</label>
+                                <div class="mt-2.5">
+                                    <textarea name="message" id="message" rows="4" required class="block w-full rounded-md border-0 py-2 px-3.5 bg-white dark:bg-background text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6"></textarea>
+                                    <p class="error-message mt-1 text-pink-500 text-xs hidden">Message cannot be empty.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-10 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4">
+                            <button type="button" id="generate-outline-btn" class="flex w-full items-center justify-center rounded-md bg-secondary px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">✨ Generate Project Outline</button>
+                            <button type="submit" class="block w-full rounded-md bg-brand px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">Send Transmission</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="success-message" class="hidden mt-16 text-center p-8 bg-white dark:bg-background rounded-lg border border-brand">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Transmission Received!</h3>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">Thank you for reaching out. We'll get back to you at light speed.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-100 dark:bg-background-dark border-t border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="xl:grid xl:grid-cols-3 xl:gap-8">
+                <div class="space-y-8 xl:col-span-1">
+                     <a href="#" class="text-2xl font-orbitron font-bold text-gray-900 dark:text-white">
+                        Quantum<span class="text-brand">Leap</span>
+                    </a>
+                    <p class="text-gray-500 dark:text-gray-400 text-base">Propelling your business into the future.</p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-400 hover:text-brand"><span class="sr-only">Twitter</span><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg></a>
+                        <a href="#" class="text-gray-400 hover:text-brand"><span class="sr-only">Instagram</span><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c-4.013 0-4.49 0-6.066.088-1.575.07-2.654.338-3.59.723-.936.385-1.71.936-2.394 1.71-.684.774-1.125 1.458-1.41 2.394C.338 9.508.07 10.587.002 12.162 0 13.737 0 14.217 0 18.233s0 4.495.002 6.066c.068 1.575.33 2.654.723 3.59.385.936.936 1.71 1.71 2.394.774.684 1.458 1.125 2.394 1.41 1.575.068 2.055.086 6.066.086s4.49-.018 6.066-.086c1.575-.068 2.654-.33 3.59-.723.936-.385 1.71-.936 2.394-1.71.684-.774 1.125-1.458 1.41-2.394.068-1.575.086-2.055.086-6.066s-.018-4.495-.086-6.066c-.068-1.575-.33-2.654-.723-3.59-.385-.936-.936-1.71-1.71-2.394-.774-.684-1.458-1.125-2.394-1.41-1.575-.068-2.055-.086-6.066-.086zM12 4.887c4.027 0 4.48.018 6.09.088 1.474.066 2.298.332 2.828.542.66.252 1.148.645 1.645 1.148.5.5.895 1 .148 1.645.21.53.475 1.354.542 2.828.07 1.61.088 2.063.088 6.09s-.018 4.48-.088 6.09c-.066 1.474-.332 2.298-.542 2.828-.252.66-.645 1.148-1.148 1.645-.5.5-1 .895-1.645 1.148-.53.21-1.354.475-2.828.542-1.61.07-2.063.088-6.09.088s-4.48-.018-6.09-.088c-1.474-.066-2.298-.332-2.828-.542-.66-.252-1.148-.645-1.645-1.148-.5-.5-.895-1-1.148-1.645-.21-.53-.475-1.354-.542-2.828-.07-1.61-.088-2.063-.088-6.09s.018-4.48.088-6.09c.066-1.474.332-2.298.542-2.828.252-.66.645-1.148 1.148-1.645.5-.5 1-.895 1.645-1.148.53-.21 1.354-.475 2.828-.542C7.52 4.905 7.973 4.887 12 4.887zM12 9.25a5.75 5.75 0 100 11.5 5.75 5.75 0 000-11.5zM12 18a3 3 0 110-6 3 3 0 010 6zM18.25 7.125a1.625 1.625 0 100-3.25 1.625 1.625 0 000 3.25z" clip-rule="evenodd" /></svg></a>
+                        <a href="#" class="text-gray-400 hover:text-brand"><span class="sr-only">LinkedIn</span><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>
+                    </div>
+                </div>
+                <div class="mt-12 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
+                    <div class="md:grid md:grid-cols-2 md:gap-8">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Solutions</h3>
+                            <ul role="list" class="mt-4 space-y-4">
+                                <li><a href="#services" class="text-base text-gray-500 dark:text-gray-400 hover:text-brand">AI Analytics</a></li>
+                                <li><a href="#services" class="text-base text-gray-500 dark:text-gray-400 hover:text-brand">Web Dev</a></li>
+                                <li><a href="#services" class="text-base text-gray-500 dark:text-gray-400 hover:text-brand">Branding</a></li>
+                            </ul>
+                        </div>
+                        <div class="mt-12 md:mt-0">
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">Company</h3>
+                            <ul role="list" class="mt-4 space-y-4">
+                                <li><a href="#team" class="text-base text-gray-500 dark:text-gray-400 hover:text-brand">Team</a></li>
+                                <li><a href="#testimonials" class="text-base text-gray-500 dark:text-gray-400 hover:text-brand">Testimonials</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-200 dark:border-gray-800 pt-8">
+                <p class="text-base text-gray-400 xl:text-center">&copy; 2025 Quantum Leap Digital. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Action Button -->
+    <button id="social-fab" class="fixed bottom-6 right-6 bg-gradient-to-br from-brand to-secondary text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center z-50 hover:scale-110 smooth-transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
+    </button>
+
+    <!-- Social Menu Modal -->
+    <div id="social-menu" class="hidden fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="relative w-48 h-48 flex items-center justify-center">
+            <div class="central-logo text-4xl font-orbitron font-bold text-white">QL</div>
+            <a href="#" class="social-icon social-icon-up text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22.46 6c-.77.35-1.6.58-2.46.67.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98-3.54-.18-6.69-1.86-8.79-4.46-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.22-1.95-.55v.05c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 01-1.94.07 4.28 4.28 0 004 2.98 8.52 8.52 0 01-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21c7.35 0 11.37-6.08 11.37-11.37 0-.17 0-.34-.01-.51.78-.57 1.45-1.28 1.98-2.08z" /></svg></a>
+            <a href="#" class="social-icon social-icon-right text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c-4.013.002-4.493.018-6.066.088-1.575.07-2.654.338-3.59.723a4.72 4.72 0 00-1.71 1.71c-.385.936-.653 2.015-.723 3.59C.15 9.508.134 9.988.132 14s.018 4.492.088 6.066c.07 1.575.338 2.654.723 3.59a4.72 4.72 0 001.71 1.71c.936.385 2.015.653 3.59.723 1.573.07 2.053.086 6.066.088s4.492-.018 6.066-.088c1.575-.07 2.654-.338 3.59-.723a4.72 4.72 0 001.71-1.71c-.385-.936-.653-2.015-.723-3.59C23.85 18.492 23.866 18.012 23.868 14s-.018-4.492-.088-6.066c-.07-1.575-.338-2.654-.723-3.59a4.72 4.72 0 00-1.71-1.71c-.936-.385-2.015-.653-3.59-.723C16.807 2.018 16.327 2.002 12.315 2zM8.45 10.012a3.562 3.562 0 117.125 0 3.562 3.562 0 01-7.125 0zm10.117-2.31a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0zM12 15.312a5.312 5.312 0 100-10.625 5.312 5.312 0 000 10.625z" clip-rule="evenodd" /></svg></a>
+            <a href="#" class="social-icon social-icon-down text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.012 2.002c-5.517 0-9.982 4.465-9.982 9.982 0 2.25.753 4.332 2.02 6.02l-1.34 4.922 5.05-1.32c1.62.758 3.43.94 5.252.94h.01c5.518 0 9.983-4.465 9.983-9.982 0-5.518-4.465-9.983-9.983-9.983z"/></svg></a>
+            <a href="#" class="social-icon social-icon-left text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 0h-15A4.5 4.5 0 000 4.5v15A4.5 4.5 0 004.5 24h15a4.5 4.5 0 004.5-4.5v-15A4.5 4.5 0 001.5 0zM8.25 19.5h-3v-9h3v9zM6.75 8.625a1.875 1.875 0 110-3.75 1.875 1.875 0 010 3.75zM19.5 19.5h-3v-4.312c0-1.125-.025-2.5-1.5-2.5s-1.75 1.188-1.75 2.438V19.5h-3v-9h2.812v1.312h.05c.375-.75 1.312-1.5 2.812-1.5 3 0 3.562 1.938 3.562 4.5v4.688z"/></svg></a>
+            <button id="close-social-menu" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/10 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-white/20 smooth-transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Gemini Modals -->
+    <div id="gemini-modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50"></div>
+    <div id="gemini-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-background-dark rounded-lg shadow-xl w-full max-w-2xl p-6 relative border border-gray-200 dark:border-gray-700">
+            <button id="close-gemini-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-lg font-orbitron font-medium leading-6 text-gray-900 dark:text-white">AI-Generated Project Outline</h3>
+            <div id="gemini-results-container" class="mt-6">
+                <div id="gemini-loader" class="hidden flex items-center justify-center text-gray-600 dark:text-gray-400">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span>Generating strategy...</span>
+                </div>
+                <div id="gemini-output" class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-300"></div>
+                 <button id="copy-to-clipboard-btn" class="hidden mt-6 text-sm font-semibold text-brand hover:text-brand-dark">Copy Outline</button>
+            </div>
+        </div>
+    </div>
+    <div id="audit-modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50"></div>
+    <div id="audit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-background-dark rounded-lg shadow-xl w-full max-w-2xl p-6 relative border border-gray-200 dark:border-gray-700">
+            <button id="close-audit-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-lg font-orbitron font-medium leading-6 text-gray-900 dark:text-white">AI Future-Proof Audit</h3>
+            <div id="audit-results-container" class="mt-6">
+                <div id="audit-loader" class="hidden flex items-center justify-center text-gray-600 dark:text-gray-400">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span>Analyzing potential...</span>
+                </div>
+                <div id="audit-output" class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-300"></div>
+                 <button id="copy-audit-btn" class="hidden mt-6 text-sm font-semibold text-brand hover:text-brand-dark">Copy Audit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- THEME TOGGLE ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`;
+            const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
+            
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    if(themeToggle) themeToggle.innerHTML = sunIcon;
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    if(themeToggle) themeToggle.innerHTML = moonIcon;
+                }
+            }
+
+            if(themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const newTheme = isDark ? 'light' : 'dark';
+                    localStorage.setItem('theme', newTheme);
+                    applyTheme(newTheme);
+                });
+            }
+
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(savedTheme);
+
+            // --- Scroll Animation ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+
+            // --- Social Menu FAB ---
+            const fab = document.getElementById('social-fab');
+            const socialMenu = document.getElementById('social-menu');
+            const closeSocialMenuBtn = document.getElementById('close-social-menu');
+
+            fab.addEventListener('click', () => {
+                socialMenu.classList.remove('hidden');
+                setTimeout(() => socialMenu.classList.add('active'), 10);
+            });
+
+            closeSocialMenuBtn.addEventListener('click', () => {
+                socialMenu.classList.remove('active');
+                setTimeout(() => socialMenu.classList.add('hidden'), 400);
+            });
+
+            // --- FAQ Accordion ---
+            const faqData = [
+                { question: "What makes your approach 'quantum'?", answer: "We use the term 'quantum' to signify a leap beyond traditional methods. Our strategies are built on predictive analytics, AI, and deep data, allowing us to achieve results that are a significant step-change from the norm." },
+                { question: "How long does a project typically take?", answer: "Timelines vary, but a standard project, from initial analysis to deployment, typically takes between 6 to 12 weeks. We prioritize precision and impact over speed." },
+                { question: "What kind of ROI can we expect?", answer: "While results depend on the project scope, our clients typically see a significant increase in engagement, conversion rates, and overall market presence. We focus on delivering measurable, high-impact outcomes." }
+            ];
+            const faqContainer = document.getElementById('faq-container');
+            if(faqContainer) {
+                faqData.forEach((item, index) => {
+                    const faqItem = document.createElement('div');
+                    faqItem.className = 'bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-800 rounded-lg';
+                    faqItem.innerHTML = `
+                        <h2>
+                            <button type="button" class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800" data-accordion-target="#faq-body-${index}">
+                                <span>${item.question}</span>
+                                <svg data-accordion-icon class="w-6 h-6 shrink-0 smooth-transition" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            </button>
+                        </h2>
+                        <div id="faq-body-${index}" class="hidden smooth-transition">
+                            <div class="p-5 border-t border-gray-200 dark:border-gray-700">
+                                <p class="mb-2 text-gray-600 dark:text-gray-400">${item.answer}</p>
+                            </div>
+                        </div>
+                    `;
+                    faqContainer.appendChild(faqItem);
+                });
+
+                faqContainer.addEventListener('click', function(e) {
+                    const button = e.target.closest('[data-accordion-target]');
+                    if (!button) return;
+                    const targetPanel = document.querySelector(button.dataset.accordionTarget);
+                    button.querySelector('[data-accordion-icon]').classList.toggle('rotate-180');
+                    targetPanel.classList.toggle('hidden');
+                });
+            }
+
+            // --- Contact Form & Gemini API ---
+            const form = document.getElementById('contact-form');
+            const formContainer = document.getElementById('contact-form-container');
+            const successMessage = document.getElementById('success-message');
+            const generateOutlineBtn = document.getElementById('generate-outline-btn');
+            
+            const geminiModal = document.getElementById('gemini-modal');
+            const geminiModalBackdrop = document.getElementById('gemini-modal-backdrop');
+            const closeGeminiModalBtn = document.getElementById('close-gemini-modal-btn');
+            const geminiLoader = document.getElementById('gemini-loader');
+            const geminiOutput = document.getElementById('gemini-output');
+            const copyBtn = document.getElementById('copy-to-clipboard-btn');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (validateForm()) {
+                    formContainer.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+                }
+            });
+            
+            generateOutlineBtn.addEventListener('click', async () => {
+                if (!validateForm()) return;
+                
+                openGeminiModal();
+                
+                const message = document.getElementById('message').value;
+                const systemPrompt = "You are a world-class digital strategist at an agency called Quantum Leap Digital. A potential client has sent a message. Based on their message, generate a high-level, concise project outline. The outline should include: a project title, 2-3 key objectives, and a 3-step strategic approach. Use markdown for formatting (headings and lists). Keep it professional, futuristic, and exciting.";
+                const userQuery = `Here is the client's message: "${message}"`;
+
+                try {
+                    const generatedText = await callGeminiAPIWithBackoff(systemPrompt, userQuery);
+                    geminiOutput.innerHTML = generatedText.replace(/\n/g, '<br>'); // Basic markdown to HTML
+                    copyBtn.classList.remove('hidden');
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    geminiOutput.textContent = "Sorry, we couldn't generate an outline at this time. Please try again later.";
+                } finally {
+                    geminiLoader.classList.add('hidden');
+                }
+            });
+
+            function openGeminiModal() {
+                geminiModal.classList.remove('hidden');
+                geminiModalBackdrop.classList.remove('hidden');
+                geminiLoader.classList.remove('hidden');
+                geminiOutput.innerHTML = '';
+                copyBtn.classList.add('hidden');
+            }
+            
+            function closeGeminiModal() {
+                geminiModal.classList.add('hidden');
+                geminiModalBackdrop.classList.add('hidden');
+            }
+            
+            closeGeminiModalBtn.addEventListener('click', closeGeminiModal);
+            geminiModalBackdrop.addEventListener('click', closeGeminiModal);
+
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = geminiOutput.innerText;
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => { copyBtn.textContent = 'Copy Outline'; }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+                document.body.removeChild(textArea);
+            });
+            
+            // --- Audit Section & Gemini API ---
+            const runAuditBtn = document.getElementById('run-audit-btn');
+            const auditModal = document.getElementById('audit-modal');
+            const auditModalBackdrop = document.getElementById('audit-modal-backdrop');
+            const closeAuditModalBtn = document.getElementById('close-audit-modal-btn');
+            const auditLoader = document.getElementById('audit-loader');
+            const auditOutput = document.getElementById('audit-output');
+            const copyAuditBtn = document.getElementById('copy-audit-btn');
+            
+            runAuditBtn.addEventListener('click', async () => {
+                const auditDesc = document.getElementById('audit-desc').value;
+                if (!auditDesc.trim()) {
+                    alert('Please describe your business for the audit.');
+                    return;
+                }
+                
+                auditModal.classList.remove('hidden');
+                auditModalBackdrop.classList.remove('hidden');
+                auditLoader.classList.remove('hidden');
+                auditOutput.innerHTML = '';
+                copyAuditBtn.classList.add('hidden');
+
+                const systemPrompt = "You are an AI-powered business consultant for 'Quantum Leap Digital,' a futuristic digital agency. Your task is to analyze a user's business description and provide a concise 'Future-Proof Audit.' The audit should identify 2-3 key opportunities for digital transformation and recommend which of our services (AI-Powered Analytics, Quantum Web Development, Algorithmic Branding) would be most impactful, with a brief justification for each recommendation. Structure the output clearly using markdown with a main heading, subheadings for opportunities, and a final 'Recommendations' section. The tone should be insightful, professional, and forward-thinking.";
+                const userQuery = `Please analyze my business: "${auditDesc}"`;
+                
+                try {
+                    const generatedText = await callGeminiAPIWithBackoff(systemPrompt, userQuery);
+                    auditOutput.innerHTML = generatedText.replace(/\n/g, '<br>');
+                    copyAuditBtn.classList.remove('hidden');
+                } catch (error) {
+                    console.error("Error calling Gemini API for audit:", error);
+                    auditOutput.textContent = "Sorry, we couldn't generate an audit at this time. Please try again later.";
+                } finally {
+                    auditLoader.classList.add('hidden');
+                }
+            });
+
+            closeAuditModalBtn.addEventListener('click', () => {
+                auditModal.classList.add('hidden');
+                auditModalBackdrop.classList.add('hidden');
+            });
+            auditModalBackdrop.addEventListener('click', () => {
+                auditModal.classList.add('hidden');
+                auditModalBackdrop.classList.add('hidden');
+            });
+            
+            copyAuditBtn.addEventListener('click', () => {
+                const textToCopy = auditOutput.innerText;
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyAuditBtn.textContent = 'Copied!';
+                    setTimeout(() => { copyAuditBtn.textContent = 'Copy Audit'; }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+                document.body.removeChild(textArea);
+            });
+
+
+            async function callGeminiAPIWithBackoff(systemPrompt, userQuery, retries = 3, delay = 1000) {
+                const apiKey = ""; // Leave empty
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        const result = await response.json();
+                        return result.candidates?.[0]?.content?.parts?.[0]?.text || "No content generated.";
+                    } catch (error) {
+                        console.error(`Attempt ${i + 1} failed. Retrying in ${delay}ms...`, error);
+                        if (i === retries - 1) throw error;
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2;
+                    }
+                }
+            }
+
+            function validateForm() {
+                let isValid = true;
+                const inputs = form.querySelectorAll('input[required], textarea[required]');
+                
+                inputs.forEach(input => {
+                    const errorEl = input.nextElementSibling;
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('ring-pink-500');
+                        errorEl.classList.remove('hidden');
+                        errorEl.textContent = `${input.previousElementSibling.textContent} is required.`;
+                    } else if (input.type === 'email' && !validateEmail(input.value)) {
+                        isValid = false;
+                        input.classList.add('ring-pink-500');
+                        errorEl.classList.remove('hidden');
+                        errorEl.textContent = 'Please enter a valid email address.';
+                    } else {
+                        input.classList.remove('ring-pink-500');
+                        errorEl.classList.add('hidden');
+                    }
+                });
+                return isValid;
+            }
+
+            function validateEmail(email) {
+                const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+        });
+    </script>
+</body>
+</html>
