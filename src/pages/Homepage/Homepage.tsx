@@ -235,11 +235,11 @@ const MotionBackground = () => (
     return (
       <SandpackProvider key={Object.keys(files).join("-")} files={files} theme={customTheme} template="static">
         <div className="relative w-full h-full">
-          <div className="block relative w-full h-[70vh] bg-black/50 backdrop-blur-sm rounded-3xl shadow-2xl p-2 border border-white/10 group">
+          <div className="block relative w-full h-[65vh] bg-black/50 backdrop-blur-sm rounded-3xl shadow-2xl p-2 border border-white/10 group">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-sky-500 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
             <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/50">
               <SandpackLayout className="!rounded-2xl">
-                <PreviewWithLoader style={{ height: "70vh" }} backgroundImageUrl={backgroundImageUrl}/>
+                <PreviewWithLoader style={{ height: "65vh" }} backgroundImageUrl={backgroundImageUrl}/>
               </SandpackLayout>
             </div>
           </div>
@@ -568,7 +568,7 @@ export default function App() {
         </header>
 
         <main className="relative z-20 flex-grow">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
             <div className="relative w-full">
               <ResponsiveFrame
                 files={sandpackFiles}
