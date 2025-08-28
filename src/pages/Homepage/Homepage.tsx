@@ -254,6 +254,7 @@ const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
 // ⭐️ END MODIFICATION
 //================================================================
 
+
 //================================================================
 // ✨ MORE ROBUST COMPONENT TO HANDLE SANDPACK LOADING ✨
 //================================================================
@@ -265,8 +266,8 @@ const PreviewWithLoader: React.FC<{
   style: React.CSSProperties;
   backgroundImageUrl?: string; // Prop to receive the image URL
 }> = ({ style, backgroundImageUrl }) => {
-  // ⭐️ END MODIFICATION
-  //================================================================
+// ⭐️ END MODIFICATION
+//================================================================
   const { sandpack } = useSandpack();
   const { status } = sandpack;
   const [isReady, setIsReady] = useState(false);
@@ -321,10 +322,7 @@ interface ResponsiveFrameProps {
   // ⭐️ END MODIFICATION
   //================================================================
 }
-const ResponsiveFrame: React.FC<ResponsiveFrameProps> = ({
-  files,
-  backgroundImageUrl,
-}) => {
+const ResponsiveFrame: React.FC<ResponsiveFrameProps> = ({ files, backgroundImageUrl }) => {
   const customTheme = useMemo(
     () => ({
       ...sandpackDark,
@@ -351,14 +349,13 @@ const ResponsiveFrame: React.FC<ResponsiveFrameProps> = ({
     >
       <div className="relative w-full h-full">
         {/* Mobile */}
-        <div className="block sm:hidden relative w-full h-full mx-auto bg-black rounded-3xl shadow-2xl p-2">
+        <div
+          className="block sm:hidden relative w-full h-full mx-auto bg-black rounded-3xl shadow-2xl p-2"
+        >
           <div className="w-full h-full rounded-2xl overflow-hidden relative bg-black">
             <SandpackLayout className="!rounded-2xl">
               {/* ✅ CORRECT: Use relative height to fill the parent container */}
-              <PreviewWithLoader
-                style={{ height: "80vh" }}
-                backgroundImageUrl={backgroundImageUrl}
-              />
+              <PreviewWithLoader style={{ height: "80vh" }} backgroundImageUrl={backgroundImageUrl}/>
             </SandpackLayout>
           </div>
           <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-full" />
@@ -369,10 +366,7 @@ const ResponsiveFrame: React.FC<ResponsiveFrameProps> = ({
           <div className="w-full h-full rounded-2xl overflow-hidden relative bg-black/30">
             <SandpackLayout className="!rounded-2xl">
               {/* ✅ CORRECT: Use relative height here too for consistency */}
-              <PreviewWithLoader
-                style={{ height: "80vh" }}
-                backgroundImageUrl={backgroundImageUrl}
-              />
+              <PreviewWithLoader style={{ height: "80vh" }} backgroundImageUrl={backgroundImageUrl}/>
             </SandpackLayout>
           </div>
         </div>
@@ -384,56 +378,33 @@ const ResponsiveFrame: React.FC<ResponsiveFrameProps> = ({
 interface FullScreenPreviewProps {
   files: any | null;
   onClose: () => void;
-  // ✨ ADDED: Props for navigation callbacks
-  onPrev: () => void;
-  onNext: () => void;
+  //================================================================
+  // ⭐️ START MODIFICATION: Add backgroundImageUrl prop
+  //================================================================
   backgroundImageUrl?: string;
+  // ⭐️ END MODIFICATION
+  //================================================================
 }
-
 const FullScreenPreview: React.FC<FullScreenPreviewProps> = ({
   files,
   onClose,
-  // ✨ ADDED: Destructure new props
-  onPrev,
-  onNext,
-  backgroundImageUrl,
+  backgroundImageUrl, // Get prop
 }) => {
   if (!files) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black">
       <SandpackProvider files={files} template="static" theme={sandpackDark}>
-        <PreviewWithLoader
-          style={{ height: "100vh" }}
-          backgroundImageUrl={backgroundImageUrl}
-        />
+        {/* ⭐️ START MODIFICATION: Pass prop down ⭐️ */}
+        <PreviewWithLoader style={{ height: "100vh" }} backgroundImageUrl={backgroundImageUrl} />
+        {/* ⭐️ END MODIFICATION ⭐️ */}
       </SandpackProvider>
-
-      {/* ✨ MODIFIED: Repositioned Close Button */}
       <button
         onClick={onClose}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white p-3 rounded-full hover:bg-white hover:text-black transition-all transform hover:scale-110 active:scale-95 backdrop-blur-sm border border-white/20 z-10"
+        className="absolute bottom-4 left-4 bg-black/70 text-white p-3 rounded-full hover:bg-white hover:text-black transition-all transform hover:scale-110 active:scale-95 backdrop-blur-sm border border-white/20"
         title="Exit Fullscreen"
       >
         <X className="w-6 h-6" />
-      </button>
-
-      {/* ✨ ADDED: Previous Button */}
-      <button
-        onClick={onPrev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/70 text-white p-3 rounded-full hover:bg-white hover:text-black transition-all transform hover:scale-110 active:scale-95 backdrop-blur-sm border border-white/20 z-10"
-        title="Previous Template"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-
-      {/* ✨ ADDED: Next Button */}
-      <button
-        onClick={onNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/70 text-white p-3 rounded-full hover:bg-white hover:text-black transition-all transform hover:scale-110 active:scale-95 backdrop-blur-sm border border-white/20 z-10"
-        title="Next Template"
-      >
-        <ChevronRight className="w-6 h-6" />
       </button>
     </div>
   );
@@ -570,9 +541,9 @@ const TemplateDetails: React.FC<TemplateDetailsProps> = ({
                     <div className="inline-flex items-center gap-1 bg-red-500/10 text-red-400 text-xs font-medium px-2 py-1 rounded-full border border-red-500/20">
                       <span>
                         Save ₹
-                        {(website.originalPrice - website.price).toLocaleString(
-                          "en-IN"
-                        )}
+                        {(
+                          website.originalPrice - website.price
+                        ).toLocaleString("en-IN")}
                       </span>
                     </div>
                   )}
@@ -601,6 +572,7 @@ const TemplateDetails: React.FC<TemplateDetailsProps> = ({
   );
 };
 
+
 const CATEGORY_OPTIONS = [
   "Business",
   "E-commerce",
@@ -617,6 +589,7 @@ const CATEGORY_OPTIONS = [
 //================================================================
 
 const WHATSAPP_NUMBER = "9310739038";
+
 
 export default function App() {
   const [websites] = useState<any[]>(() => MOCK_WEBSITES);
@@ -782,25 +755,13 @@ export default function App() {
                   templates or build from scratch.
                 </p>
                 <div className="flex gap-3">
-                  <a
-                    href="#"
-                    className="p-2 sm:p-3 bg-neutral-800 rounded-full hover:bg-indigo-600 transition-colors"
-                    aria-label="Instagram"
-                  >
+                  <a href="#" className="p-2 sm:p-3 bg-neutral-800 rounded-full hover:bg-indigo-600 transition-colors" aria-label="Instagram">
                     <Instagram className="w-5 h-5" />
                   </a>
-                  <a
-                    href="#"
-                    className="p-2 sm:p-3 bg-neutral-800 rounded-full hover:bg-indigo-600 transition-colors"
-                    aria-label="LinkedIn"
-                  >
+                  <a href="#" className="p-2 sm:p-3 bg-neutral-800 rounded-full hover:bg-indigo-600 transition-colors" aria-label="LinkedIn">
                     <Linkedin className="w-5 h-5" />
                   </a>
-                  <a
-                    href="#"
-                    className="p-2 sm:p-3 bg-neutral-800 rounded-full hover:bg-indigo-600 transition-colors"
-                    aria-label="Github"
-                  >
+                  <a href="#" className="p-2 sm:p-3 bg-neutral-800 rounded-full hover:bg-indigo-600 transition-colors" aria-label="Github">
                     <Github className="w-5 h-5" />
                   </a>
                 </div>
@@ -812,10 +773,7 @@ export default function App() {
                 <ul className="space-y-2 text-slate-400 text-sm sm:text-base">
                   {CATEGORY_OPTIONS.slice(0, 6).map((c) => (
                     <li key={c}>
-                      <a
-                        href="#"
-                        className="hover:text-white transition-colors"
-                      >
+                      <a href="#" className="hover:text-white transition-colors">
                         {c}
                       </a>
                     </li>
@@ -827,21 +785,9 @@ export default function App() {
                   Support
                 </h5>
                 <ul className="space-y-2 text-slate-400 text-sm sm:text-base">
-                  <li>
-                    <a href="#" className="hover:text-white transition-colors">
-                      Documentation
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white transition-colors">
-                      Help Center
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white transition-colors">
-                      Contact
-                    </a>
-                  </li>
+                  <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
                 </ul>
               </div>
             </div>
@@ -859,8 +805,6 @@ export default function App() {
           <FullScreenPreview
             files={sandpackFiles}
             onClose={() => setIsFullScreen(false)}
-            onPrev={goPrev}
-            onNext={goNext}
             backgroundImageUrl={currentWebsite?.imagePath}
           />
           // ⭐️ END MODIFICATION ⭐️
