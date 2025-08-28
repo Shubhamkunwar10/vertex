@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTC Admin - Geo-Construction Dashboard 2100</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#818cf8', // indigo-400
+                            DEFAULT: '#6366f1', // indigo-500
+                            dark: '#4f46e5'  // indigo-600
+                        },
+                        secondary: {
+                            light: '#fde047', // yellow-300
+                            DEFAULT: '#facc15', // yellow-400
+                            dark: '#eab308'   // yellow-500
+                        },
+                        background: {
+                            light: '#f8fafc', // slate-50
+                            dark: '#0f172a'  // slate-900 (slightly lighter than original for better contrast)
+                        },
+                        surface: {
+                            light: '#ffffff', // white
+                            dark: '#1e293b'   // slate-800
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {  
+            --sidebar-width: 280px;  
+            --sidebar-width-collapsed: 88px;
+        }
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        
+        .sidebar { width: var(--sidebar-width); transition: width 0.3s ease-in-out; }
+
+        /* --- FIX STARTS HERE --- */
+        /* Corrected selectors to match JS, which toggles '.sidebar-collapsed' on the parent container */
+        .sidebar-collapsed #sidebar { width: var(--sidebar-width-collapsed); }
+        .sidebar-collapsed #sidebar .sidebar-text, .sidebar-collapsed #sidebar .sidebar-title { display: none; }
+        .sidebar-collapsed #sidebar .nav-link { justify-content: center; }
+        
+        /* Removed margin-left to let Flexbox handle positioning, which fixes the gap. */
+        .main-content { transition: margin-left 0.3s ease-in-out; }
+        
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-width); position: fixed; z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; } /* Ensured margin is 0 on mobile */
+            .overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.3s ease-in-out; }
+            .overlay.visible { opacity: 1; pointer-events: auto; }
+        }
+        /* --- FIX ENDS HERE --- */
+        
+        .nav-link.active { background-image: linear-gradient(to right, #4f46e520, transparent); color: #818cf8; border-right: 3px solid #6366f1; }
+        .nav-link.active i { color: #818cf8; }
+        .kpi-card { transition: transform 0.2s, box-shadow 0.2s; border: 1px solid transparent; }
+        .dark .kpi-card { border-color: #334155; }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: #6366f1; }
+        .dark .kpi-card:hover { box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1); }
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-align: center; white-space: nowrap; }
+        .status-paid, .status-delivered, .stock-level-ok, .vehicle-status-idle, .status-finalizing { background-color: #10b98130; color: #10b981; }
+        .status-pending, .status-processing, .stock-level-low, .vehicle-status-active, .status-active { background-color: #f59e0b30; color: #f59e0b; }
+        .status-overdue, .status-cancelled, .stock-level-out, .vehicle-status-maintenance, .status-planning { background-color: #ef444430; color: #ef4444; }
+        .status-shipped, .vehicle-status-delivering { background-color: #3b82f630; color: #3b82f6; }
+        .progress-bar-bg { background-color: #334155; }
+        .progress-bar-fill { background-image: linear-gradient(to right, #4f46e5, #818cf8); }
+        .action-btn { transition: color 0.2s; }
+        .action-btn:hover { color: #818cf8; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+
+    <div id="login-screen" class="fixed inset-0 bg-background-light dark:bg-background-dark flex items-center justify-center z-50">
+        <div class="text-center p-8 bg-surface-light dark:bg-surface-dark rounded-lg shadow-2xl">
+            <div class="flex items-center justify-center mb-6">
+                <i data-lucide="gem" class="w-12 h-12 text-primary"></i>
+                <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-200 ml-3">TerraConstruct</h1>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 mb-8">Geo-Construction Dashboard 2100</p>
+            <button id="login-button" class="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors text-lg font-semibold flex items-center justify-center gap-2">
+                <i data-lucide="log-in" class="w-5 h-5"></i> Access Terminal
+            </button>
+        </div>
+    </div>
+
+    <div id="app-container" class="flex h-screen overflow-hidden hidden">
+        <aside id="sidebar" class="sidebar bg-surface-light dark:bg-surface-dark h-full flex flex-col z-40 border-r border-gray-200 dark:border-slate-700">
+            <div class="flex items-center justify-center h-20 border-b border-gray-200 dark:border-slate-700 px-4">
+                <i data-lucide="gem" class="w-8 h-8 text-primary-light flex-shrink-0"></i>
+                <h1 class="text-xl font-bold text-gray-800 dark:text-gray-200 ml-2 sidebar-title whitespace-nowrap">TerraConstruct</h1>
+            </div>
+            <nav id="main-nav" class="flex-1 px-4 py-6 space-y-2">
+                <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md active" data-view="dashboard-view">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 mr-4 flex-shrink-0"></i> <span class="sidebar-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md" data-view="projects-view">
+                    <i data-lucide="hard-hat" class="w-5 h-5 mr-4 flex-shrink-0"></i> <span class="sidebar-text">Projects</span>
+                </a>
+                <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md" data-view="orders-view">
+                    <i data-lucide="package" class="w-5 h-5 mr-4 flex-shrink-0"></i> <span class="sidebar-text">Orders</span>
+                </a>
+                <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md" data-view="materials-view">
+                    <i data-lucide="cubes" class="w-5 h-5 mr-4 flex-shrink-0"></i> <span class="sidebar-text">Materials</span>
+                </a>
+                <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md" data-view="vehicles-view">
+                    <i data-lucide="truck" class="w-5 h-5 mr-4 flex-shrink-0"></i> <span class="sidebar-text">Vehicle Fleet</span>
+                </a>
+                 <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md" data-view="finance-view">
+                    <i data-lucide="dollar-sign" class="w-5 h-5 mr-4 flex-shrink-0"></i> <span class="sidebar-text">Finance</span>
+                </a>
+                <a href="#" class="nav-link flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md" data-view="customers-view">
+                    <i data-lucide="users" class="w-5 h-5 mr-4 flex-shrink-0"></i> <span class="sidebar-text">Customers</span>
+                </a>
+            </nav>
+            <div class="px-4 py-4 border-t border-gray-200 dark:border-slate-700">
+                 <button id="sidebar-toggle" class="hidden lg:flex items-center w-full px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md">
+                    <i data-lucide="chevrons-left" class="w-5 h-5 mr-4 flex-shrink-0 transition-transform"></i> <span class="sidebar-text">Collapse</span>
+                </button>
+            </div>
+        </aside>
+
+        <div id="overlay" class="overlay lg:hidden"></div>
+
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
+            <header class="bg-surface-light dark:bg-surface-dark h-20 flex items-center justify-between px-6 border-b border-gray-200 dark:border-slate-700 flex-shrink-0">
+                <div class="flex items-center">
+                    <button id="menu-toggle" class="lg:hidden mr-4 text-gray-600 dark:text-gray-300">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    <h2 id="header-title" class="text-xl font-semibold">Dashboard</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700">
+                        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                        <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                    </button>
+                    <div class="relative">
+                        <button id="notifications-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700">
+                             <i data-lucide="bell" class="w-5 h-5"></i>
+                             <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                        </button>
+                        <div id="notifications-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 z-10">
+                            <div class="p-3 border-b dark:border-slate-700"><h4 class="font-semibold">Notifications</h4></div>
+                            <div class="py-2 text-sm">
+                                <a href="#" class="notification-link flex items-start justify-between gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700" data-view="materials-view">
+                                    <div class="flex items-start gap-3">
+                                        <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500 mt-1 flex-shrink-0"></i>
+                                        <div><span class="font-semibold">Low Stock:</span> Nano-Composite Bricks are at 2,500 units.</div>
+                                    </div>
+                                    <button class="add-material-btn text-xs bg-primary text-white px-2 py-1 rounded hover:bg-primary-dark transition-colors flex-shrink-0">Add</button>
+                                </a>
+                                <a href="#" class="flex items-start gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700">
+                                    <i data-lucide="package-check" class="w-5 h-5 text-green-500 mt-1 flex-shrink-0"></i>
+                                    <div><span class="font-semibold">Order Delivered:</span> Order #HTC-9510 to Orbital Habitats Inc. is complete.</div>
+                                </a>
+                                 <a href="#" class="flex items-start gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700">
+                                    <i data-lucide="hard-hat" class="w-5 h-5 text-blue-500 mt-1 flex-shrink-0"></i>
+                                    <div><span class="font-semibold">Project Update:</span> Helios Tower has reached 90% completion.</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <button id="profile-toggle" class="flex items-center gap-2">
+                            <img src="https://i.pravatar.cc/40?u=himalayan-2100" alt="User Avatar" class="w-10 h-10 rounded-full">
+                        </button>
+                         <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 z-10">
+                            <div class="p-3 border-b dark:border-slate-700">
+                                <p class="font-semibold">Orion Valerius</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Logistics Director</p>
+                            </div>
+                            <a href="#" class="nav-link flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-700" data-view="profile-view"><i data-lucide="user" class="w-4 h-4"></i>My Profile</a>
+                            <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-700"><i data-lucide="settings" class="w-4 h-4"></i>Settings</a>
+                            <a href="#" id="logout-button" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-700 text-red-500"><i data-lucide="log-out" class="w-4 h-4"></i>Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-6 md:p-8">
+                <div id="dashboard-view" class="view-content"></div>
+                <div id="projects-view" class="view-content hidden"></div>
+                <div id="orders-view" class="view-content hidden"></div>
+                <div id="materials-view" class="view-content hidden"></div>
+                <div id="vehicles-view" class="view-content hidden"></div>
+                <div id="finance-view" class="view-content hidden"></div>
+                <div id="customers-view" class="view-content hidden"></div>
+                <div id="profile-view" class="view-content hidden"></div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        lucide.createIcons();
+
+        // --- Mock Data ---
+        const MOCK_DATA = {
+            orders: [
+                { id: 'HTC-9512', customer: 'Apex Sky-Scrapers', date: '2100-08-28', total: '250,000 cr', status: 'Processing' },
+                { id: 'HTC-9511', customer: 'Terra-Firma Geo-Projects', date: '2100-08-27', total: '120,000 cr', status: 'Shipped' },
+                { id: 'HTC-9510', customer: 'Orbital Habitats Inc.', date: '2100-08-26', total: '1,200,000 cr', status: 'Delivered' },
+                { id: 'HTC-9509', customer: 'Apex Sky-Scrapers', date: '2100-08-25', total: '75,000 cr', status: 'Cancelled' },
+                { id: 'HTC-9508', customer: 'Helios Corp', date: '2100-08-24', total: '450,000 cr', status: 'Delivered' },
+            ],
+            materials: [
+                { id: 'MAT-001', name: 'Poly-Crete', stock: 48, unit: 'tons', status: 'Low' },
+                { id: 'MAT-002', name: 'Nano-Composite Bricks', stock: 2500, unit: 'units', status: 'Low' },
+                { id: 'MAT-003', name: 'Transparent Steel Panels', stock: 850, unit: 'panels', status: 'OK' },
+                { id: 'MAT-004', name: 'Graphene Rebar', stock: 0, unit: 'meters', status: 'Out' },
+                { id: 'MAT-005', name: 'Self-Healing Concrete Mix', stock: 200, unit: 'tons', status: 'OK' },
+            ],
+            customers: [
+                { id: 'C101', company: 'Apex Sky-Scrapers', contact: 'Lyra Helios', ltv: '12.5M cr' },
+                { id: 'C102', company: 'Terra-Firma Geo-Projects', contact: 'Jax Orion', ltv: '8.2M cr' },
+                { id: 'C103', company: 'Orbital Habitats Inc.', contact: 'Dr. Aris Thorne', ltv: '25.1M cr' },
+                { id: 'C104', company: 'Helios Corp', contact: 'Ren Nova', ltv: '5.6M cr' },
+            ],
+            vehicles: [
+                { id: 'D-001', type: 'Drone', status: 'Idle', location: 'Base Station A', task: 'None' },
+                { id: 'D-002', type: 'Drone', status: 'Delivering', location: 'En route to Site Gamma', task: 'Order #HTC-9511' },
+                { id: 'EX-001', type: 'Excavator', status: 'Active', location: 'Site Gamma', task: 'Foundation Digging' },
+                { id: 'H-001', type: 'Hauler', status: 'Idle', location: 'Base Station A', task: 'None' },
+                { id: 'D-004', type: 'Drone', status: 'Maintenance', location: 'Hangar Bay 2', task: 'Scheduled diagnostics' },
+            ],
+            projects: [
+                { id: 'PROJ-01', name: 'Helios Tower', location: 'Neo-Mumbai', progress: 90, status: 'Finalizing', manager: 'Orion Valerius' },
+                { id: 'PROJ-02', name: 'Project Alpha', location: 'Himalayan Base 1', progress: 75, status: 'Active', manager: 'Jax Orion' },
+                { id: 'PROJ-03', name: 'Site Gamma', location: 'Dehradun Metroplex', progress: 55, status: 'Active', manager: 'Lyra Helios' },
+                { id: 'PROJ-04', name: 'Orbital Ring Section', location: 'LEO', progress: 20, status: 'Planning', manager: 'Dr. Aris Thorne' },
+            ],
+            finance: [
+                { id: 'INV-0722', client: 'Apex Sky-Scrapers', amount: '250,000 cr', due: '2100-09-28', status: 'Pending' },
+                { id: 'INV-0721', client: 'Terra-Firma Geo-Projects', amount: '120,000 cr', due: '2100-09-27', status: 'Pending' },
+                { id: 'INV-0720', client: 'Orbital Habitats Inc.', amount: '1,200,000 cr', due: '2100-08-26', status: 'Paid' },
+                { id: 'INV-0719', client: 'Helios Corp', amount: '450,000 cr', due: '2100-07-24', status: 'Paid' },
+                { id: 'INV-0718', client: 'Apex Sky-Scrapers', amount: '95,000 cr', due: '2100-07-15', status: 'Overdue' },
+            ]
+        };
+        
+        const appContainer = document.getElementById('app-container');
+        const loginScreen = document.getElementById('login-screen');
+        const loginButton = document.getElementById('login-button');
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const overlay = document.getElementById('overlay');
+        const mainNav = document.getElementById('main-nav');
+        const headerTitle = document.getElementById('header-title');
+        const contentDivs = document.querySelectorAll('.view-content');
+
+        // --- Login/Logout Logic ---
+        function showLoginScreen() {
+            loginScreen.classList.remove('hidden');
+            appContainer.classList.add('hidden');
+        }
+
+        function showApp() {
+            loginScreen.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            initialize();
+        }
+
+        loginButton.addEventListener('click', showApp);
+        
+        // --- Navigation Logic ---
+        function switchView(viewId) {
+            const link = document.querySelector(`.nav-link[data-view="${viewId}"]`);
+            if (!link) return;
+
+            mainNav.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+
+            contentDivs.forEach(div => div.classList.add('hidden'));
+            const view = document.getElementById(viewId);
+            view.classList.remove('hidden');
+            
+            view.innerHTML = getComponentHTML(viewId);
+            populateTablesForView(viewId);
+            if(viewId === 'dashboard-view') renderDashboardCharts();
+            
+            lucide.createIcons();
+            headerTitle.textContent = link.querySelector('.sidebar-text')?.textContent.trim() || 'Profile';
+        }
+
+        mainNav.addEventListener('click', (e) => {
+            e.preventDefault();
+            const link = e.target.closest('.nav-link');
+            if (link && link.dataset.view) switchView(link.dataset.view);
+        });
+
+        document.getElementById('profile-dropdown').addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (!link) return;
+
+            if (link.id === 'logout-button') {
+                e.preventDefault();
+                showLoginScreen();
+            } else if (link.dataset.view === 'profile-view') {
+                e.preventDefault();
+                switchView('profile-view');
+                document.getElementById('profile-dropdown').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('notifications-dropdown').addEventListener('click', (e) => {
+            const link = e.target.closest('.notification-link');
+            if (link && link.dataset.view) {
+                e.preventDefault();
+                switchView(link.dataset.view);
+                document.getElementById('notifications-dropdown').classList.add('hidden');
+            }
+        });
+        
+        document.body.addEventListener('click', (e) => {
+            const card = e.target.closest('.kpi-card[data-target-view]');
+            if(card) switchView(card.dataset.targetView);
+        });
+
+        // --- Sidebar Toggles ---
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+        });
+        
+        // --- JS FIX --- 
+        // Toggling class on the main app container and updating the icon.
+        sidebarToggle.addEventListener('click', () => {
+            appContainer.classList.toggle('sidebar-collapsed');
+            const icon = sidebarToggle.querySelector('i');
+            const isCollapsed = appContainer.classList.contains('sidebar-collapsed');
+            icon.setAttribute('data-lucide', isCollapsed ? 'chevrons-right' : 'chevrons-left');
+            lucide.createIcons();
+        });
+
+        // --- Dropdown Logic ---
+        function setupDropdown(toggleId, dropdownId) {
+            const toggle = document.getElementById(toggleId);
+            const dropdown = document.getElementById(dropdownId);
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+        }
+        setupDropdown('notifications-toggle', 'notifications-dropdown');
+        setupDropdown('profile-toggle', 'profile-dropdown');
+        document.addEventListener('click', () => {
+            document.getElementById('notifications-dropdown').classList.add('hidden');
+            document.getElementById('profile-dropdown').classList.add('hidden');
+        });
+        
+        // --- Dark/Light Mode Toggle ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const applyTheme = (theme) => {
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            if (document.getElementById('dashboard-view')?.innerHTML) {
+                renderDashboardCharts();
+            }
+        };
+        themeToggle.addEventListener('click', () => {
+            const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+        applyTheme(localStorage.getItem('theme') || 'dark');
+
+        // --- HTML Component Templates ---
+        function getComponentHTML(viewId) {
+            const createHeader = (title, buttonText) => `
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <h3 class="font-semibold text-xl">${title}</h3>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <div class="relative flex-grow sm:flex-grow-0">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <input type="text" id="${viewId.split('-')[0]}-search" placeholder="Search..." class="w-full sm:w-64 pl-10 pr-4 py-2 bg-background-light dark:bg-background-dark border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light">
+                        </div>
+                        <button class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors flex-shrink-0">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            <span class="hidden md:inline">${buttonText}</span>
+                        </button>
+                    </div>
+                </div>`;
+            const createTableContainer = (headers) => `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+                            <tr>${headers.map(h => `<th class="px-6 py-3">${h}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>`;
+            
+            switch(viewId) {
+                case 'dashboard-view':
+                    return `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="kpi-card relative bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm cursor-pointer" data-target-view="orders-view"><div class="flex justify-between items-start"><div class="flex-1"><p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders (Month)</p><p class="text-3xl font-bold mt-1">312</p></div><i data-lucide="package" class="w-8 h-8 text-primary-light"></i></div></div>
+                            <div class="kpi-card relative bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm" data-target-view="finance-view"><div class="flex justify-between items-start"><div class="flex-1"><p class="text-sm font-medium text-gray-500 dark:text-gray-400">Revenue (Month)</p><p class="text-3xl font-bold mt-1">1.8M cr</p></div><i data-lucide="trending-up" class="w-8 h-8 text-green-500"></i></div></div>
+                            <div class="kpi-card relative bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm" data-target-view="orders-view"><div class="flex justify-between items-start"><div class="flex-1"><p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Shipments</p><p class="text-3xl font-bold mt-1">18</p></div><i data-lucide="truck" class="w-8 h-8 text-amber-500"></i></div></div>
+                            <div class="kpi-card relative bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm cursor-pointer" data-target-view="vehicles-view"><div class="flex justify-between items-start"><div class="flex-1"><p class="text-sm font-medium text-gray-500 dark:text-gray-400">Vehicle Fleet Status</p><p class="text-3xl font-bold mt-1">98% Online</p></div><i data-lucide="satellite" class="w-8 h-8 text-sky-500"></i></div></div>
+                        </div>
+                        <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 mt-6">
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm xl:col-span-3"><h3 class="font-semibold text-lg">Monthly Sales</h3><div class="h-96 mt-4"><canvas id="salesChart"></canvas></div></div>
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm xl:col-span-2"><h3 class="font-semibold text-lg">Project Progress</h3><div class="h-96 mt-4"><canvas id="projectProgressChart"></canvas></div></div>
+                        </div>`;
+                case 'orders-view':
+                    return `<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm">${createHeader('Manage Orders', 'Add Order')}${createTableContainer(['Order ID', 'Customer', 'Date', 'Total', 'Status', 'Actions'])}</div>`;
+                case 'materials-view':
+                    return `<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm">${createHeader('Materials Inventory', 'Add Material')}${createTableContainer(['Material ID', 'Name', 'Stock', 'Unit', 'Status', 'Actions'])}</div>`;
+                case 'vehicles-view':
+                     return `<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm">${createHeader('Vehicle Fleet', 'Add Vehicle')}${createTableContainer(['Vehicle ID', 'Type', 'Status', 'Location', 'Current Task', 'Actions'])}</div>`;
+                case 'customers-view':
+                     return `<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm">${createHeader('Customer Directory', 'Add Customer')}${createTableContainer(['Customer ID', 'Company', 'Contact', 'Lifetime Value', 'Actions'])}</div>`;
+                case 'projects-view':
+                     return `<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm">${createHeader('Project Overview', 'Add Project')}${createTableContainer(['Project Name', 'Location', 'Progress', 'Status', 'Manager', 'Actions'])}</div>`;
+                case 'finance-view':
+                     return `<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-sm">${createHeader('Financial Overview', 'Add Invoice')}${createTableContainer(['Invoice ID', 'Client', 'Amount', 'Due Date', 'Status', 'Actions'])}</div>`;
+                case 'profile-view':
+                    return `<div class="bg-surface-light dark:bg-surface-dark p-8 rounded-lg shadow-sm max-w-4xl mx-auto">
+                        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-8">
+                            <div class="flex flex-col items-center flex-shrink-0">
+                                <img src="https://i.pravatar.cc/120?u=himalayan-2100" alt="User Avatar" class="w-32 h-32 rounded-full ring-4 ring-primary-light">
+                                <button class="mt-4 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2">
+                                    <i data-lucide="edit" class="w-4 h-4"></i> Edit Profile
+                                </button>
+                            </div>
+                            <div class="flex-1 text-center sm:text-left w-full">
+                                <h3 class="text-3xl font-bold">Orion Valerius</h3>
+                                <p class="text-lg text-primary-light font-medium">Logistics Director</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">ID: OV-7781</p>
+                                
+                                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-slate-700">
+                                    <h4 class="font-semibold text-lg mb-4">Contact & Department Information</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                                        <div class="flex items-center gap-3 justify-center sm:justify-start">
+                                            <i data-lucide="mail" class="w-5 h-5 text-gray-400"></i>
+                                            <span>orion.v@terranconstruct.io</span>
+                                        </div>
+                                        <div class="flex items-center gap-3 justify-center sm:justify-start">
+                                            <i data-lucide="phone" class="w-5 h-5 text-gray-400"></i>
+                                            <span>+91-135-555-2100</span>
+                                        </div>
+                                        <div class="flex items-center gap-3 justify-center sm:justify-start">
+                                            <i data-lucide="building-2" class="w-5 h-5 text-gray-400"></i>
+                                            <span>Central Logistics</span>
+                                        </div>
+                                        <div class="flex items-center gap-3 justify-center sm:justify-start">
+                                            <i data-lucide="map-pin" class="w-5 h-5 text-gray-400"></i>
+                                            <span>Dehradun Metroplex HQ</span>
+                                        </div>
+                                         <div class="flex items-center gap-3 justify-center sm:justify-start">
+                                            <i data-lucide="shield" class="w-5 h-5 text-gray-400"></i>
+                                            <span>Security Clearance: Level 7</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                default: return '';
+            }
+        }
+
+        // --- Data Population and Filtering ---
+        function populateTablesForView(viewId) {
+            const tableViews = {
+                'orders-view': { data: MOCK_DATA.orders, row: o => `<tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50"><td class="px-6 py-4 font-medium text-primary-light">${o.id}</td><td class="px-6 py-4">${o.customer}</td><td class="px-6 py-4">${o.date}</td><td class="px-6 py-4">${o.total}</td><td class="px-6 py-4"><span class="status-badge status-${o.status.toLowerCase()}">${o.status}</span></td><td class="px-6 py-4 flex justify-end gap-2"><button class="p-1 action-btn"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="p-1 action-btn"><i data-lucide="edit-2" class="w-4 h-4"></i></button></td></tr>` },
+                'materials-view': { data: MOCK_DATA.materials, row: i => `<tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50"><td class="px-6 py-4 font-medium">${i.id}</td><td class="px-6 py-4">${i.name}</td><td class="px-6 py-4">${i.stock.toLocaleString()}</td><td class="px-6 py-4">${i.unit}</td><td class="px-6 py-4"><span class="status-badge stock-level-${i.status.toLowerCase()}">${i.status}</span></td><td class="px-6 py-4 flex justify-end gap-2"><button class="p-1 action-btn"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-1 action-btn"><i data-lucide="history" class="w-4 h-4"></i></button></td></tr>` },
+                'vehicles-view': { data: MOCK_DATA.vehicles, row: v => `<tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50"><td class="px-6 py-4 font-medium">${v.id}</td><td class="px-6 py-4">${v.type}</td><td class="px-6 py-4"><span class="status-badge vehicle-status-${v.status.toLowerCase().replace(/\s+/g, '-')}">${v.status}</span></td><td class="px-6 py-4">${v.location}</td><td class="px-6 py-4">${v.task}</td><td class="px-6 py-4 flex justify-end gap-2"><button class="p-1 action-btn"><i data-lucide="map-pin" class="w-4 h-4"></i></button></td></tr>` },
+                'customers-view': { data: MOCK_DATA.customers, row: c => `<tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50"><td class="px-6 py-4 font-medium">${c.id}</td><td class="px-6 py-4">${c.company}</td><td class="px-6 py-4">${c.contact}</td><td class="px-6 py-4">${c.ltv}</td><td class="px-6 py-4 flex justify-end gap-2"><button class="p-1 action-btn"><i data-lucide="mail" class="w-4 h-4"></i></button><button class="p-1 action-btn"><i data-lucide="edit-2" class="w-4 h-4"></i></button></td></tr>` },
+                'projects-view': { data: MOCK_DATA.projects, row: p => `<tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50"><td class="px-6 py-4 font-medium">${p.name}</td><td class="px-6 py-4">${p.location}</td><td class="px-6 py-4"><div class="flex items-center gap-2"><div class="w-full progress-bar-bg rounded-full h-2.5"><div class="progress-bar-fill h-2.5 rounded-full" style="width: ${p.progress}%"></div></div><span class="text-xs font-semibold">${p.progress}%</span></div></td><td class="px-6 py-4"><span class="status-badge status-${p.status.toLowerCase()}">${p.status}</span></td><td class="px-6 py-4">${p.manager}</td><td class="px-6 py-4 flex justify-end gap-2"><button class="p-1 action-btn"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="p-1 action-btn"><i data-lucide="edit-2" class="w-4 h-4"></i></button></td></tr>` },
+                'finance-view': { data: MOCK_DATA.finance, row: f => `<tr class="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50"><td class="px-6 py-4 font-medium text-primary-light">${f.id}</td><td class="px-6 py-4">${f.client}</td><td class="px-6 py-4">${f.amount}</td><td class="px-6 py-4">${f.due}</td><td class="px-6 py-4"><span class="status-badge status-${f.status.toLowerCase()}">${f.status}</span></td><td class="px-6 py-4 flex justify-end gap-2"><button class="p-1 action-btn"><i data-lucide="download" class="w-4 h-4"></i></button></td></tr>` },
+            };
+
+            if (tableViews[viewId]) {
+                const { data, row } = tableViews[viewId];
+                populateTable(`#${viewId} table`, data, row);
+                // Simple search logic
+                const searchInput = document.getElementById(`${viewId.split('-')[0]}-search`);
+                if(searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        const searchTerm = e.target.value.toLowerCase();
+                        const filteredData = data.filter(item => JSON.stringify(item).toLowerCase().includes(searchTerm));
+                        populateTable(`#${viewId} table`, filteredData, row);
+                        lucide.createIcons();
+                    });
+                }
+            }
+        }
+        
+        function populateTable(tableSelector, data, rowGenerator) {
+            const tbody = document.querySelector(`${tableSelector} tbody`);
+            if (tbody) tbody.innerHTML = data.map(rowGenerator).join('');
+        }
+        
+        // --- Chart Rendering ---
+        let salesChartInstance, projectChartInstance;
+        function renderDashboardCharts() {
+            if (salesChartInstance) salesChartInstance.destroy();
+            if (projectChartInstance) projectChartInstance.destroy();
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const textColor = isDark ? '#e2e8f0' : '#334155';
+            const chartOptions = (extraOptions = {}) => ({
+                responsive: true, maintainAspectRatio: false,
+                scales: { y: { ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { color: gridColor } } },
+                plugins: { legend: { labels: { color: textColor } } }, ...extraOptions
+            });
+
+            const salesCtx = document.getElementById('salesChart')?.getContext('2d');
+            if(salesCtx) salesChartInstance = new Chart(salesCtx, {
+                type: 'line',
+                data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'], datasets: [{ label: 'Revenue (in Millions cr)', data: [1.2, 1.1, 1.4, 1.3, 1.6, 1.5, 1.7, 1.8], borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4 }] },
+                options: chartOptions()
+            });
+
+            const projectCtx = document.getElementById('projectProgressChart')?.getContext('2d');
+            if(projectCtx) projectChartInstance = new Chart(projectCtx, {
+                type: 'bar',
+                data: { labels: ['Helios Tower', 'Project Alpha', 'Site Gamma', 'Orbital Ring'], datasets: [{ label: 'Completion %', data: [90, 75, 55, 20], backgroundColor: ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe'] }] },
+                options: chartOptions({ indexAxis: 'y', plugins: { legend: { display: false } } })
+            });
+        }
+
+        // --- Initial Load ---
+        function initialize() {
+            const initialView = document.querySelector('.view-content:not(.hidden)').id;
+            switchView(initialView);
+        }
+        
+        showLoginScreen();
+    });
+    </script>
+</body>
+</html>

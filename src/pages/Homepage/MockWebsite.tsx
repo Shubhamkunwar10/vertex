@@ -68,45 +68,73 @@ export const MOCK_WEBSITES = [
     },
     imagePath: "/templates/DoctorPortfolio3D.png",
   },
-  // {
-  //   id: "bespoke-ecommerce-3d-configurator",
-  //   title: "Aura Bespoke - 3D Product Configurator",
-  //   category: "E-commerce",
-  //   price: 25000,
-  //   originalPrice: 32000,
-  //   tags: [
-  //     "3D Product Configurator",
-  //     "Real-time Customization",
-  //     "Next.js",
-  //     "User Info",
-  //     "React 3 D",
-  //   ],
-  //   // UPDATED: from htmlPath to files object
-  //   files: {
-  //     "/index.html": "/templates/AuraBespoke.html",
-  //   },
-  //   imagePath: "/thumbnails/synergy-bi.webp",
-  // },
-  // {
-  //   id: "saas-analytics-dashboard-v2",
-  //   title: "Synergy BI - Collaborative Analytics Dashboard",
-  //   category: "SaaS / Business",
-  //   price: 40000,
-  //   originalPrice: 50000,
-  //   tags: [
-  //     "SaaS Platform",
-  //     "Real-time Dashboard",
-  //     "D3.js Data Viz",
-  //     "Collaborative Tools",
-  //     "Secure Authentication (RBAC)",
-  //     "AI-Generated Insights",
-  //     "PDF Reporting",
-  //     "WebSockets",
-  //   ],
-  //   // UPDATED: from htmlPath to files object
-  //   files: {
-  //     "/index.html": "/templates/SynergyBI.html",
-  //   },
-  //   imagePath: "/thumbnails/synergy-bi.webp",
-  // },
+    {
+    "id": "himalayan-builders-v1",
+    "title": "Himalayan Heritage Builders - Construction & Materials",
+    "category": "Construction",
+    "price": 18000,
+    "originalPrice": 18000,
+    "tags": [
+      "3D Model Integration",
+      "Three.js",
+      "Interactive UI",
+      "Tailwind CSS",
+      "Corporate",
+      "Dark Mode",
+      "Responsive",
+      "Testimonials",
+      "FAQ",
+      "Single-Page App"
+    ],
+    "files": {
+      "/index.html": "/templates/ConstructionSimple.html"
+    },
+    "imagePath": "/templates/ConstrcutionSimple.png"
+  },
+  {
+    "id": "himalayan-builders-v2",
+    "title": "Construction & Materials",
+    "category": "Construction",
+    "price": 25000,
+    "originalPrice": 30000,
+    "tags": [
+      "3D Model Integration",
+      "Three.js",
+      "Interactive UI",
+      "Tailwind CSS",
+      "Corporate",
+      "Dark Mode",
+      "Responsive",
+      "Testimonials",
+      "FAQ",
+      "Single-Page App"
+    ],
+    "files": {
+      "/index.html": "/templates/Construction.html"
+    },
+    "imagePath": "/templates/Construction.png"
+  },
+
+  {
+    id: "saas-analytics-dashboard-v2",
+    title: "Synergy BI - Collaborative Analytics Dashboard",
+    category: "SaaS / Business",
+    price: 50000,
+    originalPrice: 50000,
+    tags: [
+      "SaaS Platform",
+      "Real-time Dashboard",
+      "D3.js Data Viz",
+      "Collaborative Tools",
+      "Secure Authentication (RBAC)",
+      "AI-Generated Insights",
+      "PDF Reporting",
+      "WebSockets",
+    ],
+    // UPDATED: from htmlPath to files object
+    files: {
+      "/index.html": "/templates/SynergyBI.html",
+    },
+    imagePath: "/templates/SynergyBI.png",
+  },
 ];

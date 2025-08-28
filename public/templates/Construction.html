@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Himalayan Heritage Builders - A Century of Excellence (Since 1925)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#dcae5a',
+                            DEFAULT: '#c89b43',
+                            dark: '#b3882f'
+                        },
+                        background: {
+                            light: '#f8f7f2',
+                            DEFAULT: '#2c3038',
+                            dark: '#1a1c20'
+                        },
+                        prose: {
+                            light: '#374151',
+                            dark: '#d1d5db'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand-default: #c89b43;
+            --bg-light: #f8f7f2;
+        }
+
+        /* --- PRELOADER STYLES --- */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background-color: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
+        }
+        .dark #preloader {
+             background-color: #1a1c20;
+        }
+        #preloader.loaded {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .preloader-logo {
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        body.loading {
+            overflow: hidden;
+        }
+
+        .font-playfair { font-family: 'Playfair Display', serif; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* --- INTERACTIVE SHOWROOM STYLES --- */
+        #interactive-showroom {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            cursor: grab;
+        }
+        #interactive-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #interactive-ui-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .product-label {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 28, 32, 0.7);
+            color: #f8f7f2;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            white-space: nowrap;
+            opacity: 0.7;
+            pointer-events: all;
+        }
+        .product-label:hover, .product-label.hovered {
+            transform: translate(-50%, -50%) scale(1.1);
+            opacity: 1;
+        }
+        .product-label .info-icon {
+            cursor: pointer;
+            background-color: var(--brand-default);
+            color: #1a1c20;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+        }
+
+        /* --- MACHINERY CONTROLS --- */
+        .controls-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .control-btn {
+            transition: all 0.2s ease;
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+            background-color: var(--brand-default);
+        }
+        
+        /* --- FAQ ACCORDION --- */
+        .faq-item summary {
+            list-style: none; /* Hide default marker */
+            cursor: pointer;
+        }
+        .faq-item summary::-webkit-details-marker {
+            display: none; /* Hide default marker for Safari */
+        }
+        .faq-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .faq-item[open] .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        /* --- FOOTER FAB --- */
+        #fab-container.open .social-icons {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+        #fab-container .icon-close { display: none; }
+        #fab-container.open .icon-close { display: block; }
+        #fab-container.open .icon-plus { display: none; }
+
+
+        /* --- OTHER STYLES --- */
+        #product-detail-modal.hidden, #quote-modal.hidden { display: none; }
+        .nav-link { position: relative; }
+        .nav-link::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -4px; left: 50%; background-color: var(--brand-default);
+            transition: all 0.3s ease-out; transform: translateX(-50%);
+        }
+        .nav-link:hover::after { width: 100%; }
+        .three-canvas { min-height: 150px; cursor: grab; }
+        .three-canvas:active { cursor: grabbing; }
+
+    </style>
+</head>
+<body class="loading bg-background-light dark:bg-background-dark text-prose-light dark:text-prose-dark">
+
+    <div id="preloader">
+        <div class="preloader-logo text-3xl font-playfair font-bold text-gray-900 dark:text-white">
+            Himalayan <span class="text-brand">Heritage</span> Builders
+        </div>
+    </div>
+
+    <header class="bg-background-light/80 dark:bg-background/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-2xl font-playfair font-bold text-gray-900 dark:text-white">
+                        [<span class="text-brand">Company</span> Logo ]
+                        </a>
+                </div>
+                <nav class="hidden md:flex items-center space-x-10">
+                    <a href="#legacy" class="nav-link text-sm font-medium text-gray-500 dark:text-gray-400">Our Legacy</a>
+                    <a href="#machinery" class="nav-link text-sm font-medium text-gray-500 dark:text-gray-400">Machinery</a>
+                    <a href="#showroom" class="nav-link text-sm font-medium text-gray-500 dark:text-gray-400">Showroom</a>
+                      <a href="#faq" class="nav-link text-sm font-medium text-gray-500 dark:text-gray-400">FAQ</a>
+                    <a href="#contact" class="nav-link text-sm font-medium text-gray-500 dark:text-gray-400">Contact</a>
+                </nav>
+                <div class="flex items-center">
+                    <button id="theme-toggle" title="Toggle Theme" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="relative flex items-center h-screen overflow-hidden">
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div class="text-center lg:text-left">
+                        <p class="font-semibold text-brand reveal">SINCE 1925</p>
+                        <h1 class="font-playfair text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl reveal" style="transition-delay: 0.1s;">A Century of Craftsmanship. A Future of Certainty.</h1>
+                        <p class="mt-6 text-lg leading-8 text-prose-light dark:text-prose-dark max-w-xl mx-auto lg:mx-0 reveal" style="transition-delay: 0.2s;">For one hundred years, Himalayan Heritage Builders has been the cornerstone of regional development, supplying the wisdom of generations for the builders of tomorrow.</p>
+                    </div>
+                    <div class="h-[50vh] lg:h-[80vh] reveal" style="transition-delay: 0.3s;">
+                        <div id="threejs-building-canvas" class="w-full h-full three-canvas"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="legacy" class="py-24 sm:py-32">
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="font-playfair text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">Our Hundred-Year Journey</h2>
+                </div>
+            </div>
+        </section>
+
+        <section id="machinery" class="py-24 sm:py-32 bg-gray-100 dark:bg-background">
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="font-playfair text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">Heavy Machinery Division</h2>
+                    <p class="mt-4 text-lg text-prose-light dark:text-prose-dark max-w-3xl mx-auto">Explore our fleet of state-of-the-art machinery. Each piece is a testament to our commitment to power, precision, and reliability.</p>
+                </div>
+
+                <div class="mt-20 grid lg:grid-cols-2 gap-12 items-center reveal">
+                    <div class="h-[500px] w-full bg-gray-200 dark:bg-background-dark rounded-lg">
+                        <div id="brick-machine-canvas" class="w-full h-full three-canvas"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white">Automatic Brick Making Machine</h3>
+                        <p class="mt-4 text-prose-light dark:text-prose-dark">High-efficiency hydraulic press for uniform, high-strength brick production. Increase your output and consistency with our automated solutions.</p>
+                        <div class="mt-8 p-4 rounded-lg controls-panel">
+                            <h4 class="font-semibold text-center">Live Demonstration</h4>
+                            <div class="mt-4 flex justify-center">
+                                <button id="brick-machine-start" class="control-btn bg-brand text-background-dark font-bold py-2 px-6 rounded-lg">Start Cycle</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-20 grid lg:grid-cols-2 gap-12 items-center reveal">
+                    <div class="order-last lg:order-first">
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white">Articulated Excavator</h3>
+                        <p class="mt-4 text-prose-light dark:text-prose-dark">Powerful and precise, our excavators are maintained for peak performance in the toughest conditions. Full 360-degree rotation and multi-joint arm control.</p>
+                        <div id="excavator-controls" class="mt-8 p-4 rounded-lg controls-panel grid grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-semibold text-center">Cabin</h4>
+                                <div class="flex justify-center gap-2 mt-2">
+                                    <button class="control-btn w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700" data-action="cabin-left">⟲</button>
+                                    <button class="control-btn w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700" data-action="cabin-right">⟳</button>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-center">Boom (Main Arm)</h4>
+                                <div class="flex justify-center gap-2 mt-2">
+                                    <button class="control-btn w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700" data-action="boom-up">↑</button>
+                                    <button class="control-btn w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700" data-action="boom-down">↓</button>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-center">Stick (Forearm)</h4>
+                                <div class="flex justify-center gap-2 mt-2">
+                                    <button class="control-btn w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700" data-action="stick-in">←</button>
+                                    <button class="control-btn w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700" data-action="stick-out">→</button>
+                                </div>
+                            </div>
+                             <div>
+                                <h4 class="font-semibold text-center">Bucket</h4>
+                                <div class="flex justify-center gap-2 mt-2">
+                                    <button class="control-btn w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700" data-action="bucket-in">⤸</button>
+                                    <button class="control-btn w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700" data-action="bucket-out">⤹</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-[500px] w-full bg-gray-200 dark:bg-background-dark rounded-lg">
+                        <div id="excavator-canvas" class="w-full h-full three-canvas"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="showroom" class="py-24 sm:py-32">
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
+                <h2 class="font-playfair text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">Interactive Materials Showroom</h2>
+                <p class="mt-4 text-lg text-prose-light dark:text-prose-dark max-w-3xl mx-auto">Explore our core products in a dynamic 3D space. Click and drag to orbit, hover over items to learn more.</p>
+            </div>
+            <div id="interactive-showroom" class="mt-16 reveal">
+                <div id="interactive-canvas"></div>
+                <div id="interactive-ui-container"></div>
+            </div>
+        </section>
+
+        <section id="testimonials" class="py-24 sm:py-32 bg-gray-100 dark:bg-background">
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="font-playfair text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">What Our Partners Say</h2>
+                    <p class="mt-4 text-lg text-prose-light dark:text-prose-dark max-w-3xl mx-auto">A century of trust, built one project at a time.</p>
+                </div>
+                <div class="mt-20 grid gap-8 lg:grid-cols-3">
+                    <div class="bg-background-light dark:bg-background-dark p-8 rounded-lg shadow-lg reveal">
+                        <blockquote class="text-prose-light dark:text-prose-dark">
+                            <p>"Himalayan Heritage isn't just a supplier; they're a partner. Their material quality and on-time delivery have been critical to our success on multiple high-altitude projects."</p>
+                        </blockquote>
+                        <figcaption class="mt-6 flex items-center gap-4">
+                            <img class="h-12 w-12 rounded-full" src="https://i.pravatar.cc/48?u=1" alt="Avatar">
+                            <div>
+                                <div class="font-semibold text-gray-900 dark:text-white">Aarav Singh</div>
+                                <div class="text-gray-600 dark:text-gray-400">CEO, Pinnacle Constructions</div>
+                            </div>
+                        </figcaption>
+                    </div>
+                    <div class="bg-background-light dark:bg-background-dark p-8 rounded-lg shadow-lg reveal" style="transition-delay: 0.1s;">
+                        <blockquote class="text-prose-light dark:text-prose-dark">
+                            <p>"The new heavy machinery division is a game-changer. Renting their state-of-the-art excavator saved us significant capital and kept our timelines intact. Highly recommended."</p>
+                        </blockquote>
+                        <figcaption class="mt-6 flex items-center gap-4">
+                            <img class="h-12 w-12 rounded-full" src="https://i.pravatar.cc/48?u=2" alt="Avatar">
+                            <div>
+                                <div class="font-semibold text-gray-900 dark:text-white">Priya Sharma</div>
+                                <div class="text-gray-600 dark:text-gray-400">Project Manager, Terra Firma Infra</div>
+                            </div>
+                        </figcaption>
+                    </div>
+                    <div class="bg-background-light dark:bg-background-dark p-8 rounded-lg shadow-lg reveal" style="transition-delay: 0.2s;">
+                        <blockquote class="text-prose-light dark:text-prose-dark">
+                            <p>"For generations, my family has relied on Himalayan Heritage. From my grandfather's small shop to our current commercial complexes, their commitment to quality is unwavering."</p>
+                        </blockquote>
+                        <figcaption class="mt-6 flex items-center gap-4">
+                            <img class="h-12 w-12 rounded-full" src="https://i.pravatar.cc/48?u=3" alt="Avatar">
+                            <div>
+                                <div class="font-semibold text-gray-900 dark:text-white">Rohan Gupta</div>
+                                <div class="text-gray-600 dark:text-gray-400">Director, Gupta & Sons Realty</div>
+                            </div>
+                        </figcaption>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="py-24 sm:py-32">
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center reveal">
+                    <h2 class="font-playfair text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">Frequently Asked Questions</h2>
+                    <p class="mt-4 text-lg text-prose-light dark:text-prose-dark max-w-3xl mx-auto">Answers to common queries about our products, services, and operations.</p>
+                </div>
+                <div class="mt-16 max-w-4xl mx-auto">
+                    <div class="divide-y divide-gray-300 dark:divide-gray-700">
+                        <details class="py-6 faq-item reveal">
+                            <summary class="flex justify-between items-center font-semibold text-lg text-gray-900 dark:text-white">
+                                What areas do you serve?
+                                <span class="faq-icon text-brand text-3xl font-light">+</span>
+                            </summary>
+                            <div class="mt-4 text-prose-light dark:text-prose-dark">
+                                We primarily serve Dehradun and the surrounding regions, including Rishikesh, Haridwar, Mussoorie, and Vikasnagar. For large-scale projects, we can arrange logistics for delivery across other parts of Uttarakhand. Please contact us to discuss your specific location.
+                            </div>
+                        </details>
+                        <details class="py-6 faq-item reveal">
+                            <summary class="flex justify-between items-center font-semibold text-lg text-gray-900 dark:text-white">
+                                Do you provide delivery to construction sites?
+                                <span class="faq-icon text-brand text-3xl font-light">+</span>
+                            </summary>
+                            <div class="mt-4 text-prose-light dark:text-prose-dark">
+                                Yes, we offer reliable and timely delivery directly to your construction site. Our fleet of trucks can handle various load sizes, ensuring your materials arrive when you need them. Delivery charges are calculated based on distance and order volume.
+                            </div>
+                        </details>
+                        <details class="py-6 faq-item reveal">
+                            <summary class="flex justify-between items-center font-semibold text-lg text-gray-900 dark:text-white">
+                                Can I rent heavy machinery for a single day?
+                                <span class="faq-icon text-brand text-3xl font-light">+</span>
+                            </summary>
+                            <div class="mt-4 text-prose-light dark:text-prose-dark">
+                                Absolutely. We offer flexible rental plans for our heavy machinery, including daily, weekly, and monthly rates. All our equipment is well-maintained and comes with the option of a certified operator.
+                            </div>
+                        </details>
+                         <details class="py-6 faq-item reveal">
+                            <summary class="flex justify-between items-center font-semibold text-lg text-gray-900 dark:text-white">
+                                Are your materials suited for the local Himalayan climate?
+                                <span class="faq-icon text-brand text-3xl font-light">+</span>
+                            </summary>
+                            <div class="mt-4 text-prose-light dark:text-prose-dark">
+                                Yes. With a century of experience in the region, we specialize in sourcing and providing materials that are specifically suited to the unique geological and climatic conditions of the Himalayas. Our products are tested for durability against factors like heavy rainfall, seismic activity, and temperature fluctuations.
+                            </div>
+                        </details>
+                        <details class="py-6 faq-item reveal">
+                            <summary class="flex justify-between items-center font-semibold text-lg text-gray-900 dark:text-white">
+                                How can I get a quote for a bulk order?
+                                <span class="faq-icon text-brand text-3xl font-light">+</span>
+                            </summary>
+                            <div class="mt-4 text-prose-light dark:text-prose-dark">
+                                For bulk orders and project-specific quotes, please get in touch with our sales team directly via the phone number or email listed in the contact section below. We offer competitive pricing for large volume purchases.
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer id="contact" class="bg-gray-200 dark:bg-background-dark border-t border-gray-300 dark:border-gray-800 relative">
+        <div class="max-w-screen-xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-center md:text-left">
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-playfair font-bold text-gray-900 dark:text-white">Himalayan <span class="text-brand">Heritage</span> Builders</h3>
+                    <p class="text-sm text-prose-light dark:text-prose-dark">Your foundational partner in construction since 1925, providing unparalleled quality materials and machinery in the heart of Uttarakhand.</p>
+                </div>
+                <div class="space-y-4">
+                    <h4 class="font-semibold tracking-wider uppercase text-gray-800 dark:text-gray-200">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#legacy" class="hover:text-brand transition-colors">Our Legacy</a></li>
+                        <li><a href="#machinery" class="hover:text-brand transition-colors">Machinery</a></li>
+                        <li><a href="#showroom" class="hover:text-brand transition-colors">Showroom</a></li>
+                        <li><a href="#testimonials" class="hover:text-brand transition-colors">Testimonials</a></li>
+                        <li><a href="#faq" class="hover:text-brand transition-colors">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <h4 class="font-semibold tracking-wider uppercase text-gray-800 dark:text-gray-200">Get In Touch</h4>
+                    <address class="space-y-2 text-sm not-italic">
+                        <p>123 Industrial Area, Sahastradhara Rd<br>Dehradun, Uttarakhand 248001</p>
+                        <p><a href="tel:+911352607000" class="hover:text-brand transition-colors">📞 +91 135-2607000</a></p>
+                        <p><a href="mailto:sales@hhbuilders.dev" class="hover:text-brand transition-colors">✉️ sales@hhbuilders.dev</a></p>
+                    </address>
+                </div>
+                <div class="space-y-4">
+                    <h4 class="font-semibold tracking-wider uppercase text-gray-800 dark:text-gray-200">Stay Updated</h4>
+                    <p class="text-sm">Join our newsletter for industry insights and offers.</p>
+                    <form class="mt-4 flex max-w-sm mx-auto md:mx-0">
+                        <input type="email" placeholder="Your email" required class="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-brand-dark">
+                        <button type="submit" class="px-4 py-2 font-bold text-background-dark bg-brand rounded-r-md hover:bg-brand-dark transition-colors">➔</button>
+                    </form>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-400 dark:border-gray-700 pt-8 text-center">
+                <p class="text-sm text-gray-500 dark:text-gray-400">&copy; 2025 Himalayan Heritage Builders. All Rights Reserved.</p>
+            </div>
+        </div>
+        
+        <div id="fab-container" class="absolute bottom-8 right-8">
+            <div class="social-icons flex flex-col items-center gap-4 mb-4 opacity-0 transform-gpu translateY-2 pointer-events-none transition-all duration-300">
+                <a href="#" class="w-12 h-12 rounded-full bg-brand hover:bg-brand-dark flex items-center justify-center text-background-dark shadow-lg">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-9.96 4.46-9.96 9.96s4.46 9.96 9.96 9.96c5.5 0 9.96-4.46 9.96-9.96S17.5 2.04 12 2.04zm4.47 11.96h-2.14v7.22h-3.3v-7.22H9.36v-2.8h1.67v-2.07c0-1.46.73-3.73 3.73-3.73h2.5v2.8h-1.55c-.3 0-.74.15-.74.8v2.2h2.3l-.28 2.8z"/></svg>
+                </a>
+                <a href="#" class="w-12 h-12 rounded-full bg-brand hover:bg-brand-dark flex items-center justify-center text-background-dark shadow-lg">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.67.88-.53 1.56-1.37 1.88-2.38-.83.49-1.74.85-2.7 1.03A4.48 4.48 0 0016.1 4c-2.38 0-4.3 1.92-4.3 4.3 0 .34.04.67.11.98C8.28 9.09 5.16 7.38 3.06 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.76 2.81 1.91 3.58-.71 0-1.37-.22-1.95-.54v.05c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 01-1.94.07 4.3 4.3 0 004.02 2.98 8.92 8.92 0 01-5.51 1.9A8.63 8.63 0 012 18.44a12.6 12.6 0 006.84 2c8.21 0 12.7-6.8 12.7-12.7v-.57c.86-.62 1.6-1.4 2.2-2.28z"/></svg>
+                </a>
+            </div>
+            <button id="fab-toggle" class="w-16 h-16 rounded-full bg-brand-dark text-white flex items-center justify-center shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark focus:ring-brand">
+                <svg class="w-8 h-8 icon-plus" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <svg class="w-8 h-8 icon-close" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </footer>
+    
+    <div id="product-detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-background-dark rounded-lg shadow-xl w-full max-w-2xl p-8 relative max-h-[90vh] overflow-y-auto">
+            <button id="close-product-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 id="modal-title" class="text-3xl font-playfair font-bold text-gray-900 dark:text-white"></h3>
+            <p id="modal-price" class="mt-2 text-xl font-semibold text-brand"></p>
+            <p id="modal-description" class="mt-4 text-prose-light dark:text-prose-dark"></p>
+            <div id="modal-details" class="mt-6 prose prose-sm dark:prose-invert max-w-none text-prose-light dark:text-prose-dark"></div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        const preloader = document.getElementById('preloader');
+        window.onload = () => {
+            document.body.classList.remove('loading');
+            preloader.classList.add('loaded');
+            setTimeout(() => preloader.style.display = 'none', 800);
+        };
+        
+        function setupCoreUI() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const sunIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`;
+            const moonIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
+            const applyTheme = (theme) => {
+                const isDark = theme === 'dark';
+                document.documentElement.classList.toggle('dark', isDark);
+                if(themeToggle) themeToggle.innerHTML = isDark ? sunIcon : moonIcon;
+                window.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark } }));
+            };
+            if(themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+                    localStorage.setItem('theme', newTheme);
+                    applyTheme(newTheme);
+                });
+            }
+            applyTheme(localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { 
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        const canvas = entry.target.querySelector('.three-canvas');
+                        if (canvas) {
+                            window.dispatchEvent(new CustomEvent('startAnimation', { detail: { id: canvas.id }}));
+                        }
+                    } else {
+                        const canvas = entry.target.querySelector('.three-canvas');
+                        if (canvas) {
+                            window.dispatchEvent(new CustomEvent('stopAnimation', { detail: { id: canvas.id }}));
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+            const fabContainer = document.getElementById('fab-container');
+            const fabToggle = document.getElementById('fab-toggle');
+            if (fabToggle) {
+                fabToggle.addEventListener('click', () => {
+                    fabContainer.classList.toggle('open');
+                });
+            }
+        }
+
+        function createScene(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return null;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+            let animationId = null;
+            
+            window.addEventListener('resize', () => {
+                if (!container.clientWidth) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }, false);
+            
+            const start = (animateFn) => {
+                if (!animationId) {
+                    const loop = () => {
+                        animateFn();
+                        animationId = requestAnimationFrame(loop);
+                    };
+                    loop();
+                }
+            };
+            const stop = () => {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            };
+
+            window.addEventListener('startAnimation', e => { if (e.detail.id === containerId) start(env.animate); });
+            window.addEventListener('stopAnimation', e => { if (e.detail.id === containerId) stop(); });
+
+            const env = { scene, camera, renderer, container, start, stop, animate: () => {} };
+            return env;
+        }
+
+        function initCompletedBuildingScene() {
+            const env = createScene('threejs-building-canvas');
+            if (!env) return;
+            const { scene, camera, renderer, start } = env;
+            camera.position.set(10, 8, 15);
+            camera.lookAt(0, 4, 0);
+
+            scene.fog = new THREE.Fog(0x000000, 15, 40);
+            scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.0));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(10, 20, 5);
+            scene.add(dirLight);
+
+            const building = new THREE.Group();
+            const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xd7c7b7, metalness: 0.1, roughness: 0.8 });
+            const glassMaterial = new THREE.MeshStandardMaterial({ color: 0x6699cc, metalness: 0.8, roughness: 0.1, transparent: true, opacity: 0.6 });
+            const roofMaterial = new THREE.MeshStandardMaterial({ color: 0x5a3d2b, metalness: 0.1, roughness: 0.9 });
+            const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x889980, roughness: 1.0 });
+
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+            
+            const mainBlock = new THREE.Mesh(new THREE.BoxGeometry(10, 12, 8), wallMaterial);
+            mainBlock.position.y = 6;
+            building.add(mainBlock);
+
+            const roof = new THREE.Mesh(new THREE.CylinderGeometry(0, 8, 3, 4, 1), roofMaterial);
+            roof.position.y = 12 + 1.5;
+            roof.rotation.y = Math.PI / 4;
+            building.add(roof);
+
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 2; j++) {
+                    const windowPane = new THREE.Mesh(new THREE.BoxGeometry(2, 2.5, 0.2), glassMaterial);
+                    windowPane.position.set(-2.5 + j * 5, 2.5 + i * 4, 4.05);
+                    building.add(windowPane);
+                }
+            }
+            scene.add(building);
+            
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.target.set(0, 4, 0);
+            controls.enableDamping = true;
+            controls.enableZoom = false;
+            controls.enablePan = false;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
+
+            env.animate = () => {
+                controls.update();
+                renderer.render(scene, camera);
+            };
+            start(env.animate);
+        }
+
+        function initInteractiveShowroom() {
+            const env = createScene('interactive-canvas');
+            if (!env) return;
+            const { scene, camera, renderer, container, start } = env;
+            
+            camera.position.set(0, 0, 25);
+            scene.background = document.documentElement.classList.contains('dark') ? new THREE.Color(0x1a1c20) : new THREE.Color(0xf8f7f2);
+            window.addEventListener('themeChanged', e => {
+                scene.background = e.detail.isDark ? new THREE.Color(0x1a1c20) : new THREE.Color(0xf8f7f2);
+            });
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+            dirLight.position.set(5, 10, 7);
+            scene.add(dirLight);
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.enableZoom = false;
+
+            const products = [
+                { id: 'cement', name: 'Rock-Solid Cement (50kg)', price: '₹450', description: 'A high-performance Portland Pozzolana Cement (PPC).', details: '<ul><li>Grade: 53-Grade Equivalent PPC</li></ul>' },
+                { id: 'brick', name: 'Terracotta Brick', price: '₹8', description: 'Classic wire-cut terracotta bricks.', details: '<ul><li>Dimensions: 9" x 4.5" x 3"</li></ul>' },
+                { id: 'hardhat', name: 'Site-Safe Hard Hat', price: '₹250', description: 'An ANSI-compliant hard hat.', details: '<ul><li>Material: High-density polyethylene (HDPE)</li></ul>' },
+                { id: 'rebar', name: 'TMT Steel Rebar (12mm)', price: '₹95/kg', description: 'High-strength thermo-mechanically treated steel bars.', details: '<ul><li>Grade: Fe-500D</li><li>Standard Length: 12m</li></ul>' },
+                { id: 'sand', name: 'Fine River Sand', price: '₹2,500/ton', description: 'Washed and graded fine sand for plastering and masonry.', details: '<ul><li>Type: Zone-II Graded</li><li>Silt Content: < 3%</li></ul>' },
+                { id: 'aggregate', name: 'Crushed Stone Aggregate (20mm)', price: '₹1,800/ton', description: 'Angular crushed stone for high-strength concrete.', details: '<ul><li>Size: 20mm Nominal</li><li>Usage: RCC, Pavement</li></ul>' },
+                { id: 'pvc_pipe', name: 'PVC Conduit Pipe (4 inch)', price: '₹450/10ft', description: 'Durable and corrosion-resistant PVC pipe.', details: '<ul><li>Schedule: 40</li><li>Material: Unplasticized PVC</li></ul>' },
+                { id: 'safety_vest', name: 'High-Visibility Safety Vest', price: '₹300', description: 'Fluorescent vest with reflective strips for site safety.', details: '<ul><li>Standard: ANSI/ISEA 107</li><li>Material: Polyester Mesh</li></ul>' },
+                { id: 'goggles', name: 'Protective Safety Goggles', price: '₹180', description: 'Anti-fog and scratch-resistant goggles for eye protection.', details: '<ul><li>Lens: Polycarbonate</li><li>UV Protection: 99.9%</li></ul>' },
+                { id: 'mixer', name: 'Portable Cement Mixer', price: '₹25,000', description: 'A compact electric cement mixer for small to medium jobs.', details: '<ul><li>Capacity: 140 Litres</li><li>Motor: 0.75 HP</li></ul>' }
+            ];
+            const interactiveObjects = [];
+            const uiContainer = document.getElementById('interactive-ui-container');
+
+            const createCementBag = () => new THREE.Mesh(new THREE.BoxGeometry(2, 3, 0.8), new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.8 }));
+            const createBrick = () => new THREE.Mesh(new THREE.BoxGeometry(2.25, 0.75, 1.125), new THREE.MeshStandardMaterial({ color: 0xba5e47, roughness: 0.9 }));
+            const createHardHat = () => new THREE.Mesh(new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xfccf03, metalness: 0.1, roughness: 0.4 }));
+            const createRebar = () => { const group = new THREE.Group(); for (let i = 0; i < 3; i++) { const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4, 8), new THREE.MeshStandardMaterial({ color: 0x808080, metalness: 0.8, roughness: 0.4 })); bar.position.set((i - 1) * 0.3, 0, 0); bar.rotation.z = Math.PI / 8; group.add(bar); } return group; };
+            const createSandPile = () => new THREE.Mesh(new THREE.ConeGeometry(1.5, 1, 32), new THREE.MeshStandardMaterial({ color: 0xd2b48c, roughness: 1.0 }));
+            const createAggregate = () => { const group = new THREE.Group(); for(let i=0; i<10; i++){ const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(0.3, 0), new THREE.MeshStandardMaterial({color: 0x909090, roughness: 0.8})); rock.position.set(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5); group.add(rock); } return group; };
+            const createPvcPipe = () => new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 5, 32), new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.3 }));
+            const createSafetyVest = () => new THREE.Mesh(new THREE.BoxGeometry(1.5, 2, 0.2), new THREE.MeshStandardMaterial({ color: 0x90EE90, roughness: 0.6 }));
+            const createGoggles = () => { const group = new THREE.Group(); const lens = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 32); const glass = new THREE.MeshStandardMaterial({color: 0xaaddff, transparent: true, opacity: 0.4}); const left = new THREE.Mesh(lens, glass); left.position.x = -0.6; group.add(left); const right = new THREE.Mesh(lens, glass); right.position.x = 0.6; group.add(right); return group; };
+            const createMixer = () => { const group = new THREE.Group(); const drum = new THREE.Mesh(new THREE.CylinderGeometry(1, 1.5, 2, 16), new THREE.MeshStandardMaterial({ color: 0xffa500 })); drum.rotation.z = Math.PI/4; const stand = new THREE.Mesh(new THREE.BoxGeometry(2,1,1), new THREE.MeshStandardMaterial({color: 0x555555})); stand.position.y = -1; group.add(drum, stand); return group; };
+
+            products.forEach(product => {
+                let mesh;
+                if (product.id === 'cement') mesh = createCementBag();
+                else if (product.id === 'brick') mesh = createBrick();
+                else if (product.id === 'hardhat') mesh = createHardHat();
+                else if (product.id === 'rebar') mesh = createRebar();
+                else if (product.id === 'sand') mesh = createSandPile();
+                else if (product.id === 'aggregate') mesh = createAggregate();
+                else if (product.id === 'pvc_pipe') mesh = createPvcPipe();
+                else if (product.id === 'safety_vest') mesh = createSafetyVest();
+                else if (product.id === 'goggles') mesh = createGoggles();
+                else if (product.id === 'mixer') mesh = createMixer();
+
+                if (mesh) {
+                    mesh.position.set((Math.random() - 0.5) * 35, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20);
+                    mesh.userData = product;
+                    scene.add(mesh);
+                    const label = document.createElement('div');
+                    label.className = 'product-label';
+                    label.innerHTML = `<span>${product.name}</span><i class="info-icon">i</i>`;
+                    uiContainer.appendChild(label);
+                    label.querySelector('.info-icon').addEventListener('click', () => openProductModal(product));
+                    interactiveObjects.push({ mesh, label, initialY: mesh.position.y });
+                }
+            });
+
+            const clock = new THREE.Clock();
+            env.animate = () => {
+                controls.update();
+                interactiveObjects.forEach(obj => {
+                    obj.mesh.position.y = obj.initialY + Math.sin(clock.getElapsedTime() + obj.initialY) * 0.5;
+                    const screenPosition = obj.mesh.position.clone().project(camera);
+                    obj.label.style.left = `${(screenPosition.x + 1) / 2 * container.clientWidth}px`;
+                    obj.label.style.top = `${(-screenPosition.y + 1) / 2 * container.clientHeight}px`;
+                });
+                renderer.render(scene, camera);
+            };
+            start(env.animate);
+        }
+
+        function initBrickMachineScene() {
+            const env = createScene('brick-machine-canvas');
+            if (!env) return;
+            const { scene, camera, renderer, start } = env;
+            camera.position.set(5, 6, 10);
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.2));
+            scene.add(new THREE.DirectionalLight(0xffffff, 0.8));
+
+            const machine = new THREE.Group();
+            const base = new THREE.Mesh(new THREE.BoxGeometry(6, 1, 4), new THREE.MeshStandardMaterial({color: 0x666666}));
+            const press = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2, 1.5), new THREE.MeshStandardMaterial({color: 0xc89b43}));
+            press.position.set(0, 2.5, 0);
+            const conveyor = new THREE.Mesh(new THREE.BoxGeometry(8, 0.5, 2), new THREE.MeshStandardMaterial({color: 0x444444}));
+            conveyor.position.set(3, 0.5, 0);
+            machine.add(base, press, conveyor);
+            scene.add(machine);
+            
+            let brick = null;
+            let isAnimating = false;
+
+            document.getElementById('brick-machine-start').addEventListener('click', () => {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                if(brick) conveyor.remove(brick);
+                brick = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 0.8), new THREE.MeshStandardMaterial({color: 0xba5e47}));
+                brick.position.set(-4, 0.5, 0); 
+                conveyor.add(brick);
+
+                const initialPressY = press.position.y;
+                const pressDownTarget = 1.2;
+                const brickEndTarget = 4;
+                
+                let startTime = null;
+                const duration = 4000;
+
+                function cycle(time) {
+                    if (!startTime) startTime = time;
+                    const elapsed = time - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    if (progress < 0.25) { 
+                        press.position.y = THREE.MathUtils.lerp(initialPressY, pressDownTarget, progress / 0.25);
+                    } else if (progress < 0.5) {
+                        press.position.y = THREE.MathUtils.lerp(pressDownTarget, initialPressY, (progress - 0.25) / 0.25);
+                    } else if (progress < 1.0) {
+                        brick.position.x = THREE.MathUtils.lerp(-4, brickEndTarget, (progress - 0.5) / 0.5);
+                    }
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(cycle);
+                    } else {
+                        isAnimating = false;
+                    }
+                }
+                requestAnimationFrame(cycle);
+            });
+
+            env.animate = () => {
+                controls.update();
+                renderer.render(scene, camera);
+            };
+            start(env.animate);
+        }
+
+        function initExcavatorScene() {
+            const env = createScene('excavator-canvas');
+            if (!env) return;
+            const { scene, camera, renderer, start } = env;
+            camera.position.set(8, 6, 12);
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.2));
+            scene.add(new THREE.DirectionalLight(0xffffff, 0.8));
+
+            const base = new THREE.Mesh(new THREE.BoxGeometry(5, 1, 3), new THREE.MeshStandardMaterial({color: 0x444444}));
+            const cabin = new THREE.Group();
+            const cabinBody = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2.5), new THREE.MeshStandardMaterial({color: 0xc89b43}));
+            cabinBody.position.y = 1.5;
+            cabin.add(cabinBody);
+            cabin.position.y = 0.5;
+            
+            const boom = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 5), new THREE.MeshStandardMaterial({color: 0xc89b43}));
+            boom.position.set(0, 1.5, 3.5);
+            boom.geometry.translate(0, 0, -2.5);
+            
+            const stick = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 4), new THREE.MeshStandardMaterial({color: 0x555555}));
+            stick.position.z = 5;
+            stick.geometry.translate(0, 0, -2);
+            boom.add(stick);
+
+            const bucket = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1, 1), new THREE.MeshStandardMaterial({color: 0xc89b43}));
+            bucket.position.z = 4;
+            bucket.geometry.translate(0, -0.5, 0);
+            stick.add(bucket);
+
+            cabin.add(boom);
+            scene.add(base, cabin);
+            
+            const actions = {
+                'cabin-left': () => cabin.rotation.y += 0.05,
+                'cabin-right': () => cabin.rotation.y -= 0.05,
+                'boom-up': () => boom.rotation.x = Math.max(-1.2, boom.rotation.x - 0.05),
+                'boom-down': () => boom.rotation.x = Math.min(0.5, boom.rotation.x + 0.05),
+                'stick-in': () => stick.rotation.x = Math.max(-1.5, stick.rotation.x - 0.05),
+                'stick-out': () => stick.rotation.x = Math.min(1.5, stick.rotation.x + 0.05),
+                'bucket-in': () => bucket.rotation.x = Math.max(-1.5, bucket.rotation.x - 0.05),
+                'bucket-out': () => bucket.rotation.x = Math.min(0.5, bucket.rotation.x + 0.05),
+            };
+            const activeActions = {};
+            document.getElementById('excavator-controls').addEventListener('mousedown', e => {
+                if(e.target.dataset.action) activeActions[e.target.dataset.action] = true;
+            });
+            window.addEventListener('mouseup', () => {
+                for(let key in activeActions) activeActions[key] = false;
+            });
+
+            env.animate = () => {
+                controls.update();
+                for(let action in activeActions) {
+                    if(activeActions[action]) actions[action]();
+                }
+                renderer.render(scene, camera);
+            };
+            start(env.animate);
+        }
+
+        const productModal = document.getElementById('product-detail-modal');
+        const closeProductModalBtn = document.getElementById('close-product-modal-btn');
+        const openProductModal = (product) => {
+            document.getElementById('modal-title').textContent = product.name;
+            document.getElementById('modal-price').textContent = product.price;
+            document.getElementById('modal-description').textContent = product.description;
+            document.getElementById('modal-details').innerHTML = product.details;
+            productModal.classList.remove('hidden');
+        };
+        const closeProductModal = () => productModal.classList.add('hidden');
+        closeProductModalBtn.addEventListener('click', closeProductModal);
+        productModal.addEventListener('click', (e) => { if (e.target === productModal) closeProductModal(); });
+
+        setupCoreUI();
+        initCompletedBuildingScene();
+        initInteractiveShowroom();
+        initBrickMachineScene();
+        initExcavatorScene();
+    });
+    </script>
+</body>
+</html>
