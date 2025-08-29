@@ -154,7 +154,7 @@ const useSandpackFiles = (website: Website | null) => {
 //================================================================
 const MeteorShower = () => {
     const meteors = useMemo(() => 
-        Array.from({ length: 15 }).map((_, i) => (
+        Array.from({ length: 35 }).map((_, i) => (
             <div
                 key={i}
                 className="meteor"
@@ -163,7 +163,7 @@ const MeteorShower = () => {
                     left: `${-10 + Math.random() * 100}%`,
                     animationDelay: `${Math.random() * 10}s`,
                     animationDuration: `${2 + Math.random() * 4}s`,
-                    transform: `scale(${0.4 + Math.random() * 0.8})` // Random size
+                    transform: `scale(${0.4 +0.5 * 0.8})` // Random size
                 }}
             />
         ))
@@ -171,7 +171,7 @@ const MeteorShower = () => {
 
     return (
         <motion.div 
-            className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10"
+            className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -207,8 +207,34 @@ const Preloader: React.FC<{ progress: number }> = ({ progress }) => {
 //================================================================
 
 // 3D Shape Component
+// 3D Shape Component (Updated with Responsive Scaling)
 function Shape({ scrollProgress }: { scrollProgress: any }) {
   const meshRef = useRef<any>(null);
+
+  // 1. State to hold the scale value
+  const [scale, setScale] = useState(1.1);
+
+  // 2. useEffect to handle window resizing
+  useEffect(() => {
+    // Function to check window size and set scale
+    const handleResize = () => {
+      if (window.innerWidth < 768) { // Breakpoint for "small screen" (e.g., tablets and phones)
+        setScale(1.1);
+      } else {
+        setScale(1.6);
+      }
+    };
+
+    // Set the initial scale
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup: remove event listener when the component unmounts
+    return () => window.removeEventListener('resize', handleResize);
+  }, []); // Empty dependency array means this runs only once on mount
+
   useFrame((state, delta) => {
     if (meshRef.current) {
       const scrollValue = scrollProgress.get();
@@ -219,7 +245,8 @@ function Shape({ scrollProgress }: { scrollProgress: any }) {
   });
 
   return (
-    <mesh ref={meshRef} scale={1.8}>
+    // 3. Use the dynamic scale state here
+    <mesh ref={meshRef} scale={scale}> 
       <TorusKnot args={[1, 0.3, 200, 24]}>
         <meshStandardMaterial color="#a855f7" wireframe={true} />
       </TorusKnot>
@@ -252,7 +279,7 @@ const HeroWith3DAnimation = ({ onViewProductClick, onBookCallClick }: {onViewPro
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-            Next-Gen Web Solutions
+            Next-Gen Software Solutions
           </h1>
           <p className="mt-6 max-w-2xl mx-auto text-lg text-gray-300">
             Explore our collection of interactive web templates or collaborate with us to build a bespoke digital experience from the ground up.
@@ -813,8 +840,7 @@ export default function App() {
         </AnimatePresence>
 
         {/* Static background pattern - z-index is lowered to ensure meteors are on top */}
-        <div className="absolute inset-0 -z-20 bg-[radial-gradient(#ffffff11_1px,transparent_1px)] [background-size:16px_16px]"></div>
-
+ <div className="absolute inset-0 -z-20 bg-[radial-gradient(#ffffff11_1px,transparent_1px)] [background-size:2px_2px] sm:[background-size:6px_6px]"></div>
         {/* Header */}
         <header className="sticky top-0 z-40 bg-gray-950/50 backdrop-blur-lg border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
