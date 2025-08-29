@@ -487,10 +487,10 @@ const TemplateDetails: React.FC<{ website: Website; onBuyNow: () => void; }> = (
             <div className="mt-6 space-y-3">
               <button
                 onClick={onBuyNow}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/20"
+                className="w-full flex items-center justify-center gap-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/20"
               >
-                <ShoppingCart className="w-5 h-5" />
-                Buy Now
+                Contact Now 
+                <img src="/whatsapp.png" alt="WhatsApp Icon" className="w-8 h-8" />
               </button>
               <div className="text-center text-xs text-gray-400">✓ Instant Delivery & Full Source Code</div>
             </div>
@@ -593,7 +593,7 @@ const Testimonials = () => {
     ];
     return (
         <SectionWrapper title="What Our Clients Say" subtitle="Testimonials">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-8">
                 {testimonials.map((t, index) => (
                     <motion.div
                         key={index}
