@@ -671,9 +671,9 @@ export default function App() {
                 setTimeout(() => setLoading(false), 50);
                 return 100;
             }
-            return prev + 8;
+            return prev + 4;
         });
-    }, 30); 
+    }, 10); 
 
     return () => clearInterval(interval);
   }, []);
