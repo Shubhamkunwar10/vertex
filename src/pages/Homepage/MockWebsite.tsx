@@ -89,7 +89,7 @@ export const MOCK_WEBSITES = [
     "files": {
       "/index.html": "/templates/ConstructionSimple.html"
     },
-    "imagePath": "/templates/ConstrcutionSimple.png"
+    "imagePath": "/templates/ConstructionSimple.png"
   },
   {
     "id": "himalayan-builders-v2",
