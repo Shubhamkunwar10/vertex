@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dr. Arin Sharma - Internal Medicine & Research</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -34,7 +31,6 @@
         }
     </script>
 
-    <!-- Google Fonts: Merriweather & Lato -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
@@ -191,13 +187,12 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-300">
 
-    <!-- HEADER -->
     <header class="bg-white/80 dark:bg-background/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex-shrink-0">
                     <a href="#" class="text-2xl font-merriweather font-bold text-gray-900 dark:text-white">
-                        Dr. Arin <span class="text-brand">Sharma</span>
+                        [ Your<span class="text-brand"> Name ]</span>
                     </a>
                 </div>
                 <nav class="hidden md:flex items-center space-x-8">
@@ -209,18 +204,31 @@
                 </nav>
                  <div class="flex items-center">
                      <button id="theme-toggle" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand transition-colors duration-300">
-                         <!-- Sun/Moon Icon will be injected here -->
+                         </button>
+                     <button id="mobile-menu-button" class="md:hidden ml-2 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
                      </button>
                  </div>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden">
+                <div class="pt-2 pb-4 space-y-1">
+                    <a href="#about" class="mobile-menu-link block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-400 hover:text-brand hover:bg-gray-50 dark:hover:bg-gray-700">About</a>
+                    <a href="#expertise" class="mobile-menu-link block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-400 hover:text-brand hover:bg-gray-50 dark:hover:bg-gray-700">Expertise</a>
+                    <a href="#research" class="mobile-menu-link block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-400 hover:text-brand hover:bg-gray-50 dark:hover:bg-gray-700">Research</a>
+                    <a href="#insights" class="mobile-menu-link block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-400 hover:text-brand hover:bg-gray-50 dark:hover:bg-gray-700">Insights</a>
+                    <a href="#contact" class="mobile-menu-link block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-400 hover:text-brand hover:bg-gray-50 dark:hover:bg-gray-700">Contact</a>
+                </div>
             </div>
         </div>
     </header>
 
     <main>
-        <!-- HERO SECTION -->
         <section id="home" class="relative overflow-hidden h-screen">
-            <div id="threejs-canvas" class="absolute inset-0 z-0"></div>
-            <div class="absolute inset-0 bg-black/30 dark:bg-black/60"></div>
+            <div id="threejs-canvas" class="absolute inset-0 z-0 bg-black"></div>
+            <div class="absolute inset-0 bg-black/30 dark:bg-black/50"></div>
             <div class="relative z-10 flex items-center justify-center h-full">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h1 class="font-merriweather text-4xl font-bold tracking-tight text-white sm:text-6xl reveal">Compassionate Care, Backed by Science</h1>
@@ -232,7 +240,6 @@
             </div>
         </section>
         
-        <!-- ABOUT SECTION -->
         <section id="about" class="py-24 sm:py-32">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 <div class="reveal">
@@ -245,7 +252,6 @@
             </div>
         </section>
 
-        <!-- EXPERTISE TIMELINE SECTION -->
         <section id="expertise" class="py-24 sm:py-32 bg-gray-100 dark:bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -253,12 +259,10 @@
                     <p class="mt-4 text-lg leading-8 text-gray-600 dark:text-gray-400">A timeline of specialized care and focus.</p>
                 </div>
                 <div id="expertise-timeline" class="timeline-container mt-16">
-                    <!-- Timeline items will be injected by JS -->
-                </div>
+                    </div>
             </div>
         </section>
         
-        <!-- TESTIMONIALS PARALLAX 1 -->
         <section class="parallax-section parallax-one relative h-96">
             <div class="absolute inset-0 bg-black/60"></div>
             <div class="relative z-10 flex items-center justify-center h-full">
@@ -271,7 +275,6 @@
             </div>
         </section>
 
-        <!-- RESEARCH SECTION with 3D Cell -->
         <section id="research" class="py-24 sm:py-32">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 <div class="reveal">
@@ -292,7 +295,6 @@
             </div>
         </section>
 
-        <!-- HEALTH INSIGHTS -->
         <section id="insights" class="py-24 sm:py-32 bg-gray-100 dark:bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -316,22 +318,20 @@
             </div>
         </section>
 
-        <!-- NEW TESTIMONIALS PARALLAX 2 -->
         <section class="parallax-section parallax-two relative h-96">
             <div class="absolute inset-0 bg-brand/30 dark:bg-brand/50"></div>
             <div class="relative z-10 flex items-center justify-center h-full">
                 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white reveal">
                      <blockquote class="text-2xl italic font-light">
-                        "Finally, a doctor who sees the whole picture. Dr. Sharma's integrated approach to medicine has made a world of difference for my chronic condition."
-                    </blockquote>
-                    <figcaption class="mt-6 font-semibold">- A. Gupta, Patient since 2020</figcaption>
+                         "Finally, a doctor who sees the whole picture. Dr. Sharma's integrated approach to medicine has made a world of difference for my chronic condition."
+                     </blockquote>
+                     <figcaption class="mt-6 font-semibold">- A. Gupta, Patient since 2020</figcaption>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
     <footer id="contact" class="bg-gray-100 dark:bg-background-dark border-t border-gray-200 dark:border-gray-800">
         <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
@@ -341,7 +341,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
                 <div class="space-y-4 md:col-span-1">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Contact Details</h3>
-                    <p class="text-gray-600 dark:text-gray-400">Sharma Medical Clinic<br>123 Health St, Dehradun, Uttarakhand</p>
+                    <p class="text-gray-600 dark:text-gray-400">Sharma Medical Clinic<br>123 Health St, Meerut, Uttar Pradesh</p>
                     <p><a href="tel:+911234567890" class="text-brand hover:text-brand-dark font-semibold">P: +91 12345 67890</a></p>
                     <p><a href="mailto:info@drarinsharma.com" class="text-brand hover:text-brand-dark font-semibold">E: info@drarinsharma.com</a></p>
                 </div>
@@ -362,7 +362,6 @@
         </div>
     </footer>
     
-    <!-- Expertise Modal -->
     <div id="expertise-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
         <div id="modal-content" class="bg-white dark:bg-background-dark rounded-lg shadow-xl w-full max-w-2xl p-8 relative">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
@@ -374,7 +373,6 @@
         </div>
     </div>
 
-    <!-- Appointment Modal -->
     <div id="appointment-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-background-dark rounded-lg shadow-xl w-full max-w-lg p-8 relative">
             <button id="close-appointment-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
@@ -399,7 +397,6 @@
         </div>
     </div>
     
-    <!-- Social FAB -->
     <div class="fixed bottom-6 right-6 z-50">
         <div id="social-menu" class="absolute bottom-0 right-0 flex flex-col items-center space-y-4 mb-16">
             <a href="#" class="social-icon transform transition-all duration-300 hover:scale-125"><svg class="h-8 w-8 text-gray-600 dark:text-gray-400 hover:text-blue-700" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>
@@ -412,7 +409,6 @@
         </button>
     </div>
 
-    <!-- JAVASCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // --- THEME TOGGLE ---
@@ -441,6 +437,23 @@
 
             const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             applyTheme(savedTheme);
+
+            // --- MOBILE MENU ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+
+                mobileMenuLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                         mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
 
             // --- SCROLL ANIMATION ---
             const observer = new IntersectionObserver((entries) => {
@@ -529,114 +542,110 @@
             const heroContainer = document.getElementById('threejs-canvas');
             if (heroContainer) {
                 const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(60, heroContainer.clientWidth / heroContainer.clientHeight, 0.1, 1000);
-                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                const camera = new THREE.PerspectiveCamera(75, heroContainer.clientWidth / heroContainer.clientHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
                 renderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
                 renderer.setPixelRatio(window.devicePixelRatio);
                 heroContainer.appendChild(renderer.domElement);
 
-                // Nebula/Galaxy background
-                const textureLoader = new THREE.TextureLoader();
-                // Create a procedural nebula texture on a canvas
-                const nebulaCanvas = document.createElement('canvas');
-                nebulaCanvas.width = 512;
-                nebulaCanvas.height = 512;
-                const context = nebulaCanvas.getContext('2d');
-                const gradient = context.createRadialGradient(256, 256, 0, 256, 256, 256);
-                gradient.addColorStop(0, 'rgba(50, 80, 150, 0.8)');
-                gradient.addColorStop(0.5, 'rgba(20, 40, 90, 0.5)');
-                gradient.addColorStop(1, 'rgba(5, 10, 30, 0)');
-                context.fillStyle = gradient;
-                context.fillRect(0, 0, 512, 512);
-                const nebulaTexture = new THREE.CanvasTexture(nebulaCanvas);
-
-                const nebulaGeo = new THREE.PlaneGeometry(300, 300);
-                const nebulaMat = new THREE.MeshBasicMaterial({ map: nebulaTexture, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
-                const nebula = new THREE.Mesh(nebulaGeo, nebulaMat);
-                nebula.position.z = -150;
-                scene.add(nebula);
-                
-                // Particle system for stars
-                const starCount = 20000;
-                const positions = new Float32Array(starCount * 3);
-                const colors = new Float32Array(starCount * 3);
-                const sizes = new Float32Array(starCount);
-                const color = new THREE.Color();
-
-                for (let i = 0; i < starCount; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * 400;
-                    positions[i * 3 + 1] = (Math.random() - 0.5) * 400;
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 400;
-                    
-                    color.setHSL(Math.random() * 0.6 + 0.5, 0.8, 0.8); // Bluish/white stars
-                    colors[i * 3] = color.r;
-                    colors[i * 3 + 1] = color.g;
-                    colors[i * 3 + 2] = color.b;
-                    sizes[i] = Math.random() * 1.5 + 0.5;
+                // Starfield
+                const starVertices = [];
+                for (let i = 0; i < 15000; i++) {
+                    const x = (Math.random() - 0.5) * 2000;
+                    const y = (Math.random() - 0.5) * 2000;
+                    const z = (Math.random() - 0.5) * 2000;
+                    starVertices.push(x, y, z);
                 }
                 const starGeometry = new THREE.BufferGeometry();
-                starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                starGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-                starGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+                starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+                const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
+                const stars = new THREE.Points(starGeometry, starMaterial);
+                scene.add(stars);
+
+                // Sun
+                const sunGeometry = new THREE.SphereGeometry(10, 32, 32);
+                const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffdd88, map: createSunTexture() });
+                const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+                scene.add(sun);
+                const sunLight = new THREE.PointLight(0xffddaa, 1.5, 500);
+                sun.add(sunLight);
+
+                // Planet
+                const planetOrbit = new THREE.Object3D();
+                scene.add(planetOrbit);
+                const planetGeometry = new THREE.SphereGeometry(3, 32, 32);
+                const planetMaterial = new THREE.MeshStandardMaterial({ color: 0x6699ff, roughness: 0.8 });
+                const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+                planet.position.x = 40;
+                planetOrbit.add(planet);
                 
-                const starMaterial = new THREE.ShaderMaterial({
-                    uniforms: {
-                        pointTexture: { value: new THREE.TextureLoader().load( 'https://threejs.org/examples/textures/sprites/spark1.png' ) }
-                    },
-                    vertexShader: `
-                        attribute float size;
-                        attribute vec3 color;
-                        varying vec3 vColor;
-                        void main() {
-                            vColor = color;
-                            vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-                            gl_PointSize = size * ( 300.0 / -mvPosition.z );
-                            gl_Position = projectionMatrix * mvPosition;
-                        }
-                    `,
-                    fragmentShader: `
-                        uniform sampler2D pointTexture;
-                        varying vec3 vColor;
-                        void main() {
-                            gl_FragColor = vec4( vColor, 1.0 );
-                            gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
-                        }
-                    `,
-                    blending: THREE.AdditiveBlending,
-                    depthTest: false,
+                // Black Hole
+                const blackHoleGroup = new THREE.Group();
+                const blackHoleGeo = new THREE.CircleGeometry(5, 32);
+                const blackHoleMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                const blackHole = new THREE.Mesh(blackHoleGeo, blackHoleMat);
+                blackHoleGroup.add(blackHole);
+                
+                const accretionDiskGeo = new THREE.RingGeometry(6, 10, 64);
+                const accretionDiskMat = new THREE.MeshBasicMaterial({
+                    map: createAccretionDiskTexture(),
+                    side: THREE.DoubleSide,
                     transparent: true,
+                    blending: THREE.AdditiveBlending
                 });
-                const starField = new THREE.Points(starGeometry, starMaterial);
-                scene.add(starField);
+                const accretionDisk = new THREE.Mesh(accretionDiskGeo, accretionDiskMat);
+                accretionDisk.rotation.x = Math.PI / 2;
+                blackHoleGroup.add(accretionDisk);
+                blackHoleGroup.position.set(-80, 20, -150);
+                scene.add(blackHoleGroup);
+
 
                 camera.position.z = 100;
-                
-                const targetRotation = { x: 0, y: 0 };
-                const mouse = { x: 0, y: 0 };
-
-                function onPointerMove(event) {
-                    if (event.isPrimary === false) return;
-                    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-                }
-                
-                document.addEventListener('mousemove', onPointerMove);
-                document.addEventListener('touchmove', (e) => onPointerMove(e.touches[0]));
+                const clock = new THREE.Clock();
 
                 function animateHero() {
                     requestAnimationFrame(animateHero);
+                    const elapsedTime = clock.getElapsedTime();
                     
-                    targetRotation.y = mouse.x * 0.1;
-                    targetRotation.x = mouse.y * 0.1;
-
-                    starField.rotation.y += (targetRotation.y - starField.rotation.y) * 0.02;
-                    starField.rotation.x += (targetRotation.x - starField.rotation.x) * 0.02;
-                    starField.rotation.z += 0.0001;
-                    nebula.rotation.z -= 0.0002;
+                    sun.rotation.y += 0.001;
+                    planet.rotation.y += 0.005;
+                    planetOrbit.rotation.y += 0.002;
+                    accretionDisk.rotation.z += 0.003;
+                    stars.rotation.y += 0.0001;
 
                     renderer.render(scene, camera);
                 }
                 animateHero();
+
+                function createSunTexture() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 256; canvas.height = 256;
+                    const context = canvas.getContext('2d');
+                    const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+                    gradient.addColorStop(0, 'rgba(255, 220, 150, 1)');
+                    gradient.addColorStop(0.8, 'rgba(255, 165, 0, 1)');
+                    gradient.addColorStop(1, 'rgba(210, 100, 0, 0.8)');
+                    context.fillStyle = gradient;
+                    context.fillRect(0, 0, 256, 256);
+                    for (let i = 0; i < 2000; i++) {
+                         context.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.1})`;
+                         context.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+                    }
+                    return new THREE.CanvasTexture(canvas);
+                }
+
+                function createAccretionDiskTexture() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 256; canvas.height = 256;
+                    const context = canvas.getContext('2d');
+                    const gradient = context.createRadialGradient(128, 128, 60, 128, 128, 128);
+                    gradient.addColorStop(0, 'rgba(255, 180, 80, 1)');
+                    gradient.addColorStop(0.5, 'rgba(255, 100, 50, 1)');
+                    gradient.addColorStop(1, 'rgba(150, 50, 150, 0)');
+                    context.fillStyle = gradient;
+                    context.fillRect(0, 0, 256, 256);
+                    return new THREE.CanvasTexture(canvas);
+                }
 
                 window.addEventListener('resize', () => {
                     camera.aspect = heroContainer.clientWidth / heroContainer.clientHeight;

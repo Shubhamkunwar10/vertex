@@ -4,8 +4,9 @@
   "private": true,
   "dependencies": {
     "@codesandbox/sandpack-react": "^2.20.0",
-    "@react-three/drei": "^10.0.0",
-    "@react-three/fiber": "9.3.0",
+    "@react-three/drei": "^10.7.4",
+    "@react-three/fiber": "^9.3.0",
+    "@react-three/rapier": "^2.1.0",
     "craco-alias": "^3.0.1",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.541.0",
@@ -14,7 +15,7 @@
     "react-dom": "^19.1.1",
     "react-error-boundary": "^6.0.0",
     "react-router-dom": "^7.7.1",
-    "three": "0.179.0"
+    "three": "^0.179.1"
   },
   "scripts": {
     "start": "craco start",

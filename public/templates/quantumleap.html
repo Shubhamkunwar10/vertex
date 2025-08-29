@@ -5,43 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quantum Leap Digital - Propelling Your Business Forward</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
-          darkMode: 'class',
-          theme: {
-            extend: {
-              colors: {
-                brand: {
-                  light: '#22d3ee', // cyan-400
-                  DEFAULT: '#06b6d4', // cyan-500
-                  dark: '#0891b2' // cyan-600
-                },
-                secondary: '#3b82f6', // blue-500
-                background: {
-                  light: '#f8fafc', // slate-50
-                  DEFAULT: '#030712', // gray-950
-                  dark: '#111827' // gray-900
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#22d3ee', // cyan-400
+                            DEFAULT: '#06b6d4', // cyan-500
+                            dark: '#0891b2' // cyan-600
+                        },
+                        secondary: '#3b82f6', // blue-500
+                        background: {
+                            light: '#f8fafc', // slate-50
+                            DEFAULT: '#030712', // gray-950
+                            dark: '#111827' // gray-900
+                        }
+                    },
+                    animation: {
+                        'infinite-scroll': 'infinite-scroll 25s linear infinite',
+                    },
+                    keyframes: {
+                        'infinite-scroll': {
+                            from: { transform: 'translateX(0)' },
+                            to: { transform: 'translateX(-100%)' },
+                        }
+                    }
                 }
-              },
-              animation: {
-                'infinite-scroll': 'infinite-scroll 25s linear infinite',
-              },
-              keyframes: {
-                'infinite-scroll': {
-                  from: { transform: 'translateX(0)' },
-                  to: { transform: 'translateX(-100%)' },
-                }
-              }
             }
-          }
         }
     </script>
 
-    <!-- Google Fonts: Orbitron & Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -120,15 +117,15 @@
 </head>
 <body class="bg-background-light dark:bg-background text-gray-800 dark:text-gray-300">
 
-    <!-- HEADER -->
     <header class="bg-white/80 dark:bg-background/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex-shrink-0">
                     <a href="#" class="text-2xl font-orbitron font-bold text-gray-900 dark:text-white">
-                       [ Company <span class="text-brand">Name ]</span>
+                        [ Company <span class="text-brand">Logo ]</span>
                     </a>
                 </div>
+
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="#services" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Services</a>
                     <a href="#audit" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Audit</a>
@@ -137,17 +134,33 @@
                     <a href="#faq" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">FAQ</a>
                     <a href="#contact" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand smooth-transition">Contact</a>
                 </nav>
-                 <div class="flex items-center">
+                
+                <div class="flex items-center">
                     <button id="theme-toggle" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand smooth-transition">
-                        <!-- Sun/Moon Icon here -->
+                        </button>
+                    <button id="mobile-menu-button" class="ml-2 md:hidden p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
                     </button>
+                </div>
+            </div>
+
+            <div class="hidden md:hidden" id="mobile-menu">
+                <div class="pt-2 pb-4 space-y-1">
+                    <a href="#services" class="text-gray-500 dark:text-gray-400 hover:text-brand block px-3 py-2 rounded-md text-base font-medium">Services</a>
+                    <a href="#audit" class="text-gray-500 dark:text-gray-400 hover:text-brand block px-3 py-2 rounded-md text-base font-medium">Audit</a>
+                    <a href="#team" class="text-gray-500 dark:text-gray-400 hover:text-brand block px-3 py-2 rounded-md text-base font-medium">Team</a>
+                    <a href="#testimonials" class="text-gray-500 dark:text-gray-400 hover:text-brand block px-3 py-2 rounded-md text-base font-medium">Testimonials</a>
+                    <a href="#faq" class="text-gray-500 dark:text-gray-400 hover:text-brand block px-3 py-2 rounded-md text-base font-medium">FAQ</a>
+                    <a href="#contact" class="text-gray-500 dark:text-gray-400 hover:text-brand block px-3 py-2 rounded-md text-base font-medium">Contact</a>
                 </div>
             </div>
         </div>
     </header>
 
     <main>
-        <!-- HERO SECTION -->
         <section id="home" class="relative isolate overflow-hidden pt-24 pb-32 sm:pt-32 sm:pb-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h1 class="font-orbitron text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl reveal">Propelling Your Business into the Future</h1>
@@ -158,7 +171,6 @@
             </div>
         </section>
         
-        <!-- OUR SERVICES -->
         <section id="services" class="py-24 sm:py-32 bg-gray-100 dark:bg-background-dark">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -182,7 +194,6 @@
             </div>
         </section>
 
-        <!-- OUR PHILOSOPHY -->
         <section id="philosophy" class="py-24 sm:py-32">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -215,7 +226,6 @@
             </div>
         </section>
         
-        <!-- AI AUDIT SECTION -->
         <section id="audit" class="py-24 sm:py-32 bg-gray-100 dark:bg-background-dark">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -232,7 +242,6 @@
             </div>
         </section>
 
-        <!-- OUR TEAM -->
         <section id="team" class="py-24 sm:py-32">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -298,7 +307,6 @@
             </div>
         </section>
 
-        <!-- TESTIMONIALS -->
         <section id="testimonials" class="py-24 sm:py-32 bg-gray-100 dark:bg-background-dark">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -410,7 +418,6 @@
             </div>
         </section>
 
-        <!-- FAQ -->
         <section id="faq" class="py-24 sm:py-32">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -418,12 +425,10 @@
                     <p class="section-subtitle">Declassifying our operational parameters.</p>
                 </div>
                 <div class="mt-12 space-y-4 reveal" id="faq-container">
-                    <!-- FAQ items will be injected by JS -->
-                </div>
+                    </div>
             </div>
         </section>
 
-        <!-- CONTACT US -->
         <section id="contact" class="py-24 sm:py-32 bg-gray-100 dark:bg-background-dark">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center reveal">
@@ -449,7 +454,7 @@
                             </div>
                             <div class="sm:col-span-2">
                                 <label for="email" class="block text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300">Email</label>
-                                <div class="mt-2.5">
+                                <div class="mt-2.5"> 
                                     <input type="email" name="email" id="email" required class="block w-full rounded-md border-0 py-2 px-3.5 bg-white dark:bg-background text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6">
                                     <p class="error-message mt-1 text-pink-500 text-xs hidden">Please enter a valid email address.</p>
                                 </div>
@@ -476,14 +481,13 @@
         </section>
     </main>
 
-    <!-- FOOTER -->
     <footer class="bg-gray-100 dark:bg-background-dark border-t border-gray-200 dark:border-gray-800">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div class="xl:grid xl:grid-cols-3 xl:gap-8">
                 <div class="space-y-8 xl:col-span-1">
                      <a href="#" class="text-2xl font-orbitron font-bold text-gray-900 dark:text-white">
-                        Quantum<span class="text-brand">Leap</span>
-                    </a>
+                         Quantum<span class="text-brand">Leap</span>
+                     </a>
                     <p class="text-gray-500 dark:text-gray-400 text-base">Propelling your business into the future.</p>
                     <div class="flex space-x-6">
                         <a href="#" class="text-gray-400 hover:text-brand"><span class="sr-only">Twitter</span><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg></a>
@@ -517,26 +521,23 @@
         </div>
     </footer>
 
-    <!-- Floating Action Button -->
     <button id="social-fab" class="fixed bottom-6 right-6 bg-gradient-to-br from-brand to-secondary text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center z-50 hover:scale-110 smooth-transition">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
     </button>
 
-    <!-- Social Menu Modal -->
     <div id="social-menu" class="hidden fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex items-center justify-center">
         <div class="relative w-48 h-48 flex items-center justify-center">
             <div class="central-logo text-4xl font-orbitron font-bold text-white">QL</div>
             <a href="#" class="social-icon social-icon-up text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22.46 6c-.77.35-1.6.58-2.46.67.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98-3.54-.18-6.69-1.86-8.79-4.46-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.22-1.95-.55v.05c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 01-1.94.07 4.28 4.28 0 004 2.98 8.52 8.52 0 01-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21c7.35 0 11.37-6.08 11.37-11.37 0-.17 0-.34-.01-.51.78-.57 1.45-1.28 1.98-2.08z" /></svg></a>
             <a href="#" class="social-icon social-icon-right text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c-4.013.002-4.493.018-6.066.088-1.575.07-2.654.338-3.59.723a4.72 4.72 0 00-1.71 1.71c-.385.936-.653 2.015-.723 3.59C.15 9.508.134 9.988.132 14s.018 4.492.088 6.066c.07 1.575.338 2.654.723 3.59a4.72 4.72 0 001.71 1.71c.936.385 2.015.653 3.59.723 1.573.07 2.053.086 6.066.088s4.492-.018 6.066-.088c1.575-.07 2.654-.338 3.59-.723a4.72 4.72 0 001.71-1.71c-.385-.936-.653-2.015-.723-3.59C23.85 18.492 23.866 18.012 23.868 14s-.018-4.492-.088-6.066c-.07-1.575-.338-2.654-.723-3.59a4.72 4.72 0 00-1.71-1.71c-.936-.385-2.015-.653-3.59-.723C16.807 2.018 16.327 2.002 12.315 2zM8.45 10.012a3.562 3.562 0 117.125 0 3.562 3.562 0 01-7.125 0zm10.117-2.31a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0zM12 15.312a5.312 5.312 0 100-10.625 5.312 5.312 0 000 10.625z" clip-rule="evenodd" /></svg></a>
             <a href="#" class="social-icon social-icon-down text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.012 2.002c-5.517 0-9.982 4.465-9.982 9.982 0 2.25.753 4.332 2.02 6.02l-1.34 4.922 5.05-1.32c1.62.758 3.43.94 5.252.94h.01c5.518 0 9.983-4.465 9.983-9.982 0-5.518-4.465-9.983-9.983-9.983z"/></svg></a>
-            <a href="#" class="social-icon social-icon-left text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 0h-15A4.5 4.5 0 000 4.5v15A4.5 4.5 0 004.5 24h15a4.5 4.5 0 004.5-4.5v-15A4.5 4.5 0 001.5 0zM8.25 19.5h-3v-9h3v9zM6.75 8.625a1.875 1.875 0 110-3.75 1.875 1.875 0 010 3.75zM19.5 19.5h-3v-4.312c0-1.125-.025-2.5-1.5-2.5s-1.75 1.188-1.75 2.438V19.5h-3v-9h2.812v1.312h.05c.375-.75 1.312-1.5 2.812-1.5 3 0 3.562 1.938 3.562 4.5v4.688z"/></svg></a>
+            <a href="#" class="social-icon social-icon-left text-gray-400 hover:text-white smooth-transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 0h-15A4.5 4.5 0 000 4.5v15A4.5 4.5 0 004.5 24h15a4.5 4.5 0 004.5-4.5v-15A4.5 4.5 0 0019.5 0zM8.25 19.5h-3v-9h3v9zM6.75 8.625a1.875 1.875 0 110-3.75 1.875 1.875 0 010 3.75zM19.5 19.5h-3v-4.312c0-1.125-.025-2.5-1.5-2.5s-1.75 1.188-1.75 2.438V19.5h-3v-9h2.812v1.312h.05c.375-.75 1.312-1.5 2.812-1.5 3 0 3.562 1.938 3.562 4.5v4.688z"/></svg></a>
             <button id="close-social-menu" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/10 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-white/20 smooth-transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
     </div>
     
-    <!-- Gemini Modals -->
     <div id="gemini-modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50"></div>
     <div id="gemini-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-background-dark rounded-lg shadow-xl w-full max-w-2xl p-6 relative border border-gray-200 dark:border-gray-700">
@@ -572,7 +573,6 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // --- THEME TOGGLE ---
@@ -601,6 +601,16 @@
 
             const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             applyTheme(savedTheme);
+            
+            // --- MOBILE MENU TOGGLE ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
 
             // --- Scroll Animation ---
             const observer = new IntersectionObserver((entries) => {

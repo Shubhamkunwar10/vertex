@@ -54,6 +54,37 @@
         }
         
         #quote-modal.hidden { display: none; }
+        
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        /* --- MOBILE MENU STYLES --- */
+        #mobile-menu-button .hamburger-line {
+            transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out;
+            transform-origin: center;
+        }
+        #mobile-menu-button.open .hamburger-line-top {
+            transform: translateY(8px) rotate(45deg);
+        }
+        #mobile-menu-button.open .hamburger-line-middle {
+            opacity: 0;
+        }
+        #mobile-menu-button.open .hamburger-line-bottom {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+        #mobile-menu {
+            transition: opacity 0.4s ease-in-out, visibility 0.4s;
+        }
+        #mobile-menu.open .mobile-nav-link {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .mobile-nav-link {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
 
         /* Timeline Styles */
         .timeline::before {
@@ -91,7 +122,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex-shrink-0">
                     <a href="#" class="text-2xl font-playfair font-bold text-gray-900 dark:text-white">
-                        Company <span class="text-brand">Logo</span>
+                        Himalayan <span class="text-brand">Heritage</span>
                     </a>
                 </div>
                 <nav class="hidden md:flex items-center space-x-8">
@@ -101,11 +132,24 @@
                 </nav>
                 <div class="flex items-center">
                     <button id="theme-toggle" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
-                        </button>
+                    </button>
+                    <button id="mobile-menu-button" title="Open Menu" class="md:hidden ml-2 p-2 w-10 h-10 flex flex-col justify-center items-center space-y-1.5 focus:outline-none z-50">
+                        <span class="hamburger-line hamburger-line-top block w-6 h-0.5 bg-gray-900 dark:bg-white"></span>
+                        <span class="hamburger-line hamburger-line-middle block w-6 h-0.5 bg-gray-900 dark:bg-white"></span>
+                        <span class="hamburger-line hamburger-line-bottom block w-6 h-0.5 bg-gray-900 dark:bg-white"></span>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
+    
+    <div id="mobile-menu" class="invisible opacity-0 fixed inset-0 bg-background-light dark:bg-background-dark z-30 flex items-center justify-center">
+        <nav class="flex flex-col items-center text-center space-y-8">
+            <a href="#legacy" class="mobile-nav-link text-3xl font-playfair font-bold text-gray-800 dark:text-gray-200" style="transition-delay: 0.1s;">Our Legacy</a>
+            <a href="#catalogue" class="mobile-nav-link text-3xl font-playfair font-bold text-gray-800 dark:text-gray-200" style="transition-delay: 0.2s;">Catalogue</a>
+            <a href="#contact" class="mobile-nav-link text-3xl font-playfair font-bold text-gray-800 dark:text-gray-200" style="transition-delay: 0.3s;">Contact</a>
+        </nav>
+    </div>
 
     <main>
         <section id="home" class="relative overflow-hidden h-screen">
@@ -244,6 +288,30 @@
             }
             const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             applyTheme(savedTheme);
+
+            // --- ANIMATED MOBILE NAVBAR ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileNavLinks = mobileMenu.querySelectorAll('.mobile-nav-link');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    const isOpen = mobileMenuButton.classList.toggle('open');
+                    document.body.classList.toggle('menu-open', isOpen);
+                    mobileMenu.classList.toggle('open', isOpen);
+                    mobileMenu.classList.toggle('invisible', !isOpen);
+                    mobileMenu.classList.toggle('opacity-0', !isOpen);
+                });
+                
+                mobileNavLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenuButton.classList.remove('open');
+                        document.body.classList.remove('menu-open');
+                        mobileMenu.classList.remove('open');
+                        mobileMenu.classList.add('invisible', 'opacity-0');
+                    });
+                });
+            }
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });

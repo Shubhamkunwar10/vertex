@@ -1,6 +1,6 @@
 // src/App.js
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,12 +12,12 @@ import {
   Linkedin,
   Github,
   Plus,
-  Code2,      // ✨ NEW ICON
-  Palette,    // ✨ NEW ICON
-  CloudCog,   // ✨ NEW ICON
-  Quote,      // ✨ NEW ICON
+  Code2,
+  Palette,
+  CloudCog,
+  Quote,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { MOCK_WEBSITES } from "./MockWebsite";
 
 // SANDPACK IMPORTS
@@ -29,8 +29,12 @@ import {
   defaultDark as sandpackDark,
 } from "@codesandbox/sandpack-react";
 
+// 3D IMPORTS
+import { Canvas, useFrame } from "@react-three/fiber";
+import { TorusKnot } from "@react-three/drei";
+
 //================================================================
-// TYPE DEFINITIONS
+// TYPE DEFINITIONS (Unchanged)
 //================================================================
 
 interface Website {
@@ -145,241 +149,361 @@ const useSandpackFiles = (website: Website | null) => {
 
 
 //================================================================
-// ✨ UI & HELPER COMPONENTS (Unchanged) ✨
+// ✨ UPDATED: Meteor Shower Effect ✨
+// Now generates meteors with random sizes for a more natural look.
 //================================================================
-const MotionBackground = () => (
-    <div className="absolute inset-0 -z-10 overflow-hidden bg-[#0D1117]">
-      <div className="absolute inset-0 bg-[radial-gradient(#ffffff11_1px,transparent_1px)] [background-size:16px_16px]"></div>
-      <motion.div
-        className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-indigo-600/20 blur-3xl filter"
-        animate={{ x: [0, 100, 0, -50, 0], y: [0, -50, 100, 50, 0], scale: [1, 1.1, 0.9, 1.2, 1] }}
-        transition={{ duration: 25, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute -bottom-1/4 -right-1/4 w-3/4 h-3/4 rounded-full bg-sky-600/20 blur-3xl filter"
-        animate={{ x: [0, -100, 0, 50, 0], y: [0, 50, -100, -50, 0], scale: [1, 0.9, 1.2, 1.1, 1] }}
-        transition={{ duration: 30, repeat: Infinity, repeatType: "mirror", ease: "easeInOut", delay: 5 }}
-      />
-    </div>
-  );
-  
-  const AnimatedLoader: React.FC<{ backgroundImageUrl?: string }> = ({ backgroundImageUrl }) => (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-lg z-10 rounded-2xl overflow-hidden">
-      {backgroundImageUrl && (
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center blur-md scale-110 opacity-20"
-          style={{ backgroundImage: `url(${backgroundImageUrl})` }}
-        />
-      )}
-      <div className="relative flex flex-col items-center justify-center">
-        <motion.div
-          className="w-10 h-10 border-2 border-indigo-400 border-t-transparent rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-        />
-        <p className="mt-4 text-sm font-medium text-gray-300 tracking-wide">
-          Loading Interactive Preview...
-        </p>
-      </div>
-    </div>
-  );
-  
-  const PreviewWithLoader: React.FC<{ style: React.CSSProperties; backgroundImageUrl?: string; }> = ({ style, backgroundImageUrl }) => {
-    const { sandpack } = useSandpack();
-    const { status } = sandpack;
-    const [isReady, setIsReady] = useState(false);
-  
-    useEffect(() => {
-      const fallbackTimer = setTimeout(() => setIsReady(true), 500);
-      if (status === "idle") {
-        clearTimeout(fallbackTimer);
-        const readyTimer = setTimeout(() => setIsReady(true), 10);
-        return () => clearTimeout(readyTimer);
-      } else {
-        setIsReady(false);
-      }
-      return () => clearTimeout(fallbackTimer);
-    }, [status]);
-  
+const MeteorShower = () => {
+    const meteors = useMemo(() => 
+        Array.from({ length: 15 }).map((_, i) => (
+            <div
+                key={i}
+                className="meteor"
+                style={{
+                    top: `${-10 + Math.random() * 100}%`,
+                    left: `${-10 + Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 10}s`,
+                    animationDuration: `${2 + Math.random() * 4}s`,
+                    transform: `scale(${0.4 + Math.random() * 0.8})` // Random size
+                }}
+            />
+        ))
+    , []);
+
     return (
-      <div className="relative w-full h-full">
-        <AnimatePresence>
-          {!isReady && <AnimatedLoader backgroundImageUrl={backgroundImageUrl} />}
-        </AnimatePresence>
-        <SandpackPreview
-          showOpenInCodeSandbox={false}
-          style={{ ...style, visibility: isReady ? "visible" : "hidden", opacity: isReady ? 1 : 0, transition: "opacity 0.5s ease-in-out, visibility 0.5s" }}
-        />
-      </div>
-    );
-  };
-  
-  const ResponsiveFrame: React.FC<{ files: any | null; backgroundImageUrl?: string; }> = ({ files, backgroundImageUrl }) => {
-    const customTheme = useMemo(
-      () => ({
-        ...sandpackDark,
-        colors: { ...sandpackDark.colors, surface1: "transparent" },
-        common: { borderRadius: "0px" },
-      }),
-      []
-    );
-  
-    if (!files) {
-      return (
-        <div className="w-full h-full flex items-center justify-center bg-black/30 rounded-3xl">
-          <AnimatedLoader />
-        </div>
-      );
-    }
-  
-    return (
-      <SandpackProvider key={Object.keys(files).join("-")} files={files} theme={customTheme} template="static">
-        <div className="relative w-full h-full">
-          <div className="block relative w-full h-[65vh] bg-black/50 backdrop-blur-sm rounded-3xl shadow-2xl p-2 border border-white/10 group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-sky-500 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-            <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/50">
-              <SandpackLayout className="!rounded-2xl">
-                <PreviewWithLoader style={{ height: "65vh" }} backgroundImageUrl={backgroundImageUrl}/>
-              </SandpackLayout>
-            </div>
-          </div>
-        </div>
-      </SandpackProvider>
-    );
-  };
-  
-  const FullScreenPreview: React.FC<{ files: any | null; onClose: () => void; backgroundImageUrl?: string; }> = ({ files, onClose, backgroundImageUrl }) => {
-    if (!files) return null;
-  
-    return (
-      <div className="fixed inset-0 z-[9999] bg-black">
-        <SandpackProvider files={files} template="static" theme={sandpackDark}>
-          <PreviewWithLoader style={{ height: "100vh" }} backgroundImageUrl={backgroundImageUrl} />
-        </SandpackProvider>
-        <button
-          onClick={onClose}
-          className="absolute bottom-5 left-5 bg-black/50 text-white p-3 rounded-full hover:bg-white hover:text-black transition-all transform hover:scale-110 active:scale-95 backdrop-blur-md border border-white/20"
-          title="Exit Fullscreen"
+        <motion.div 
+            className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
         >
-          <X className="w-6 h-6" />
-        </button>
+            {meteors}
+        </motion.div>
+    );
+};
+
+//================================================================
+// Preloader Component (Unchanged)
+//================================================================
+const Preloader: React.FC<{ progress: number }> = ({ progress }) => {
+    return (
+        <motion.div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0D1117]"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+        >
+            <div className="relative font-mono text-8xl md:text-9xl font-bold text-white">
+                <span className="animate-glitch" style={{ '--glitch-text': `"${progress}%"` } as React.CSSProperties}>
+                    {progress}%
+                </span>
+            </div>
+        </motion.div>
+    );
+};
+
+//================================================================
+// Hero Section with 3D Scrolling Animation (Unchanged)
+//================================================================
+
+// 3D Shape Component
+function Shape({ scrollProgress }: { scrollProgress: any }) {
+  const meshRef = useRef<any>(null);
+  useFrame((state, delta) => {
+    if (meshRef.current) {
+      const scrollValue = scrollProgress.get();
+      meshRef.current.rotation.y = scrollValue * Math.PI * 2;
+      meshRef.current.rotation.x = scrollValue * Math.PI * 1.5;
+      meshRef.current.rotation.z += delta * 0.1;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} scale={1.8}>
+      <TorusKnot args={[1, 0.3, 200, 24]}>
+        <meshStandardMaterial color="#a855f7" wireframe={true} />
+      </TorusKnot>
+    </mesh>
+  );
+}
+
+// Main Hero Component
+const HeroWith3DAnimation = ({ onViewProductClick, onBookCallClick }: {onViewProductClick: () => void; onBookCallClick: () => void;}) => {
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  return (
+    <div ref={heroRef} className="relative h-screen">
+      <div className="absolute inset-0 z-0">
+        <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
+          <ambientLight intensity={0.8} />
+          <pointLight position={[10, 10, 10]} intensity={1.5} />
+          <Shape scrollProgress={scrollYProgress} />
+        </Canvas>
+      </div>
+      <div className="relative z-10 flex h-full flex-col items-center justify-center text-center px-4">
+        <motion.div
+          className="max-w-3xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            Next-Gen Web Solutions
+          </h1>
+          <p className="mt-6 max-w-2xl mx-auto text-lg text-gray-300">
+            Explore our collection of interactive web templates or collaborate with us to build a bespoke digital experience from the ground up.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <motion.button
+              onClick={onViewProductClick}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg shadow-indigo-500/20"
+              whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(99, 102, 241, 0.4)" }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              View Products
+            </motion.button>
+            <motion.button
+              onClick={onBookCallClick}
+              className="w-full sm:w-auto bg-white/5 border border-white/20 backdrop-blur-sm text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300"
+              whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Book a Call
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+
+//================================================================
+// UI & HELPER COMPONENTS (Unchanged)
+//================================================================
+const AnimatedLoader: React.FC<{ backgroundImageUrl?: string }> = ({ backgroundImageUrl }) => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-lg z-10 rounded-2xl overflow-hidden">
+    {backgroundImageUrl && (
+      <div
+        className="absolute inset-0 w-full h-full bg-cover bg-center blur-md scale-110 opacity-20"
+        style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+      />
+    )}
+    <div className="relative flex flex-col items-center justify-center">
+      <motion.div
+        className="w-10 h-10 border-2 border-indigo-400 border-t-transparent rounded-full"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+      />
+      <p className="mt-4 text-sm font-medium text-gray-300 tracking-wide">
+        Loading Interactive Preview...
+      </p>
+    </div>
+  </div>
+);
+
+const PreviewWithLoader: React.FC<{ style: React.CSSProperties; backgroundImageUrl?: string; }> = ({ style, backgroundImageUrl }) => {
+  const { sandpack } = useSandpack();
+  const { status } = sandpack;
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const fallbackTimer = setTimeout(() => setIsReady(true), 500);
+    if (status === "idle") {
+      clearTimeout(fallbackTimer);
+      const readyTimer = setTimeout(() => setIsReady(true), 10);
+      return () => clearTimeout(readyTimer);
+    } else {
+      setIsReady(false);
+    }
+    return () => clearTimeout(fallbackTimer);
+  }, [status]);
+
+  return (
+    <div className="relative w-full h-full">
+      <AnimatePresence>
+        {!isReady && <AnimatedLoader backgroundImageUrl={backgroundImageUrl} />}
+      </AnimatePresence>
+      <SandpackPreview
+        showOpenInCodeSandbox={false}
+        style={{ ...style, visibility: isReady ? "visible" : "hidden", opacity: isReady ? 1 : 0, transition: "opacity 0.5s ease-in-out, visibility 0.5s" }}
+      />
+    </div>
+  );
+};
+
+const ResponsiveFrame: React.FC<{ files: any | null; backgroundImageUrl?: string; }> = ({ files, backgroundImageUrl }) => {
+  const customTheme = useMemo(
+    () => ({
+      ...sandpackDark,
+      colors: { ...sandpackDark.colors, surface1: "transparent" },
+      common: { borderRadius: "0px" },
+    }),
+    []
+  );
+
+  if (!files) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-black/30 rounded-3xl">
+        <AnimatedLoader />
       </div>
     );
-  };
-  
-  const TemplateThumbnail: React.FC<{ website: Website; onClick: () => void; isActive: boolean; isFavorite: boolean; onToggleFav: (e: React.MouseEvent<HTMLButtonElement>, id: string) => void; }> = ({ website, onClick, isActive, isFavorite, onToggleFav }) => {
-    const isNewCard = website.id === "new";
-  
-    return (
-      <div
-        onClick={onClick}
-        className={`relative flex-shrink-0 w-56 p-2 rounded-2xl cursor-pointer transition-all duration-300 snap-center group
-          ${isActive ? "bg-white/10" : "bg-white/5 hover:bg-white/10"}`}
-      >
-        <div
-          className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 
-            ${isActive ? "border-indigo-500" : "border-transparent group-hover:border-white/20"}`}
-        />
-        <div className="relative p-2 rounded-xl bg-black/20 transform transition-transform duration-300 group-hover:-translate-y-1">
-          <div className="aspect-video bg-gray-800 rounded-lg mb-3 overflow-hidden pointer-events-none relative ring-1 ring-white/10">
-            {isNewCard ? (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-600/30 to-sky-600/30">
-                <Plus className="w-8 h-8 text-emerald-400" />
-              </div>
-            ) : (
-              <img
-                src={website.imagePath}
-                alt={`${website.title} thumbnail`}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            )}
-          </div>
-          <div className="flex justify-between items-start gap-2">
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-white text-sm truncate">{website.title}</h4>
-              <p className="text-xs text-gray-400 mt-1">
-                {isNewCard ? "Start from Scratch" : `₹${website.price.toLocaleString("en-IN")}`}
-              </p>
-            </div>
-            {!isNewCard && (
-              <button
-                onClick={(e) => onToggleFav(e, website.id)}
-                className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
-              >
-                <Heart
-                  className={`w-4 h-4 transition-all ${isFavorite ? "text-red-500 fill-current" : "text-gray-400 group-hover:text-white"}`}
-                />
-              </button>
-            )}
+  }
+
+  return (
+    <SandpackProvider key={Object.keys(files).join("-")} files={files} theme={customTheme} template="static">
+      <div className="relative w-full h-full">
+        <div className="block relative w-full h-[65vh] bg-black/50 backdrop-blur-sm rounded-3xl shadow-2xl p-2 border border-white/10 group">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-sky-500 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+          <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/50">
+            <SandpackLayout className="!rounded-2xl">
+              <PreviewWithLoader style={{ height: "65vh" }} backgroundImageUrl={backgroundImageUrl}/>
+            </SandpackLayout>
           </div>
         </div>
       </div>
-    );
-  };
-  
-  const TemplateDetails: React.FC<{ website: Website; onBuyNow: () => void; }> = ({ website, onBuyNow }) => {
-    return (
-      <div className="relative z-20 max-w-6xl mx-auto px-4 -mt-12">
-        <div className="bg-gray-950/60 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12">
-            <div className="lg:col-span-8 p-8">
-              <div className="flex items-center gap-3 mb-3 mt-4">
-                <span className="text-sm font-bold uppercase text-indigo-300 tracking-wider bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30">
-                  {website.category}
-                </span>
+    </SandpackProvider>
+  );
+};
+
+const FullScreenPreview: React.FC<{ files: any | null; onClose: () => void; backgroundImageUrl?: string; }> = ({ files, onClose, backgroundImageUrl }) => {
+  if (!files) return null;
+
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black">
+      <SandpackProvider files={files} template="static" theme={sandpackDark}>
+        <PreviewWithLoader style={{ height: "100vh" }} backgroundImageUrl={backgroundImageUrl} />
+      </SandpackProvider>
+      <button
+        onClick={onClose}
+        className="absolute bottom-5 left-5 bg-black/50 text-white p-3 rounded-full hover:bg-white hover:text-black transition-all transform hover:scale-110 active:scale-95 backdrop-blur-md border border-white/20"
+        title="Exit Fullscreen"
+      >
+        <X className="w-6 h-6" />
+      </button>
+    </div>
+  );
+};
+
+const TemplateThumbnail: React.FC<{ website: Website; onClick: () => void; isActive: boolean; isFavorite: boolean; onToggleFav: (e: React.MouseEvent<HTMLButtonElement>, id: string) => void; }> = ({ website, onClick, isActive, isFavorite, onToggleFav }) => {
+  const isNewCard = website.id === "new";
+
+  return (
+    <div
+      onClick={onClick}
+      className={`relative flex-shrink-0 w-56 p-2 rounded-2xl cursor-pointer transition-all duration-300 snap-center group
+      ${isActive ? "bg-white/10" : "bg-white/5 hover:bg-white/10"}`}
+    >
+      <div
+        className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 
+        ${isActive ? "border-indigo-500" : "border-transparent group-hover:border-white/20"}`}
+      />
+      <div className="relative p-2 rounded-xl bg-black/20 transform transition-transform duration-300 group-hover:-translate-y-1">
+        <div className="aspect-video bg-gray-800 rounded-lg mb-3 overflow-hidden pointer-events-none relative ring-1 ring-white/10">
+          {isNewCard ? (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-600/30 to-sky-600/30">
+              <Plus className="w-8 h-8 text-emerald-400" />
+            </div>
+          ) : (
+            <img
+              src={website.imagePath}
+              alt={`${website.title} thumbnail`}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          )}
+        </div>
+        <div className="flex justify-between items-start gap-2">
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-white text-sm truncate">{website.title}</h4>
+            <p className="text-xs text-gray-400 mt-1">
+              {isNewCard ? "Start from Scratch" : `₹${website.price.toLocaleString("en-IN")}`}
+            </p>
+          </div>
+          {!isNewCard && (
+            <button
+              onClick={(e) => onToggleFav(e, website.id)}
+              className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <Heart
+                className={`w-4 h-4 transition-all ${isFavorite ? "text-red-500 fill-current" : "text-gray-400 group-hover:text-white"}`}
+              />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TemplateDetails: React.FC<{ website: Website; onBuyNow: () => void; }> = ({ website, onBuyNow }) => {
+  return (
+    <div className="relative z-20 max-w-6xl mx-auto px-4 -mt-12">
+      <div className="bg-gray-950/60 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12">
+          <div className="lg:col-span-8 p-8">
+            <div className="flex items-center gap-3 mb-3 mt-4">
+              <span className="text-sm font-bold uppercase text-indigo-300 tracking-wider bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30">
+                {website.category}
+              </span>
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight">
+              {website.title || <span className="text-gray-500 italic">Select a template</span>}
+            </h2>
+            {website.tags && website.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-6">
+                {website.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs font-medium bg-white/5 text-sky-300 px-3 py-1.5 rounded-full border border-white/10"
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight">
-                {website.title || <span className="text-gray-500 italic">Select a template</span>}
-              </h2>
-              {website.tags && website.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-6">
-                  {website.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs font-medium bg-white/5 text-sky-300 px-3 py-1.5 rounded-full border border-white/10"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
+            )}
+          </div>
+          <div className="lg:col-span-4 bg-white/5 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col justify-between p-8">
+            <div>
+              <div className="flex items-baseline justify-center gap-3 mb-2">
+                <span className="text-4xl font-bold text-white">₹{website.price.toLocaleString("en-IN")}</span>
+                {website.originalPrice > website.price && (
+                  <span className="text-lg text-gray-500 line-through">
+                    ₹{website.originalPrice.toLocaleString("en-IN")}
+                  </span>
+                )}
+              </div>
+              {website.originalPrice > website.price && (
+                <div className=" flex justify-center items-center gap-1 bg-red-500/10 text-red-400 text-xs font-medium px-8 py-1 rounded-full border border-red-500/20 mx-24 md:mx-32 lg:mx-8">
+                  <span >Save ₹{(website.originalPrice - website.price).toLocaleString("en-IN")}</span>
                 </div>
               )}
             </div>
-            <div className="lg:col-span-4 bg-white/5 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col justify-between p-8">
-              <div>
-                <div className="flex items-baseline justify-start gap-3 mb-2">
-                  <span className="text-4xl font-bold text-white">₹{website.price.toLocaleString("en-IN")}</span>
-                  {website.originalPrice > website.price && (
-                    <span className="text-lg text-gray-500 line-through">
-                      ₹{website.originalPrice.toLocaleString("en-IN")}
-                    </span>
-                  )}
-                </div>
-                {website.originalPrice > website.price && (
-                  <div className="inline-flex items-center gap-1 bg-red-500/10 text-red-400 text-xs font-medium px-2 py-1 rounded-full border border-red-500/20">
-                    <span>Save ₹{(website.originalPrice - website.price).toLocaleString("en-IN")}</span>
-                  </div>
-                )}
-              </div>
-              <div className="mt-6 space-y-3">
-                <button
-                  onClick={onBuyNow}
-                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/20"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  Buy Now
-                </button>
-                <div className="text-center text-xs text-gray-400">✓ Instant Delivery & Full Source Code</div>
-              </div>
+            <div className="mt-6 space-y-3">
+              <button
+                onClick={onBuyNow}
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/20"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                Buy Now
+              </button>
+              <div className="text-center text-xs text-gray-400">✓ Instant Delivery & Full Source Code</div>
             </div>
           </div>
         </div>
       </div>
-    );
-  };
-  
+    </div>
+  );
+};
+
+
 //================================================================
-// ✨ NEW: Project-Related Sections & Components ✨
+// Project-Related Sections & Components (Unchanged)
 //================================================================
 
 const SectionWrapper: React.FC<{title: string; subtitle: string; children: React.ReactNode;}> = ({ title, subtitle, children }) => (
@@ -434,9 +558,7 @@ const OurProcess = () => {
     return (
         <SectionWrapper title="Our Streamlined Process" subtitle="How It Works">
             <div className="relative">
-                {/* Connecting line */}
                 <div className="hidden md:block absolute top-5 left-1/2 w-0.5 h-[calc(100%-2.5rem)] bg-gradient-to-b from-transparent via-indigo-500 to-transparent" />
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
                     {steps.map((step, index) => (
                         <motion.div
@@ -447,11 +569,9 @@ const OurProcess = () => {
                             transition={{ duration: 0.6 }}
                             viewport={{ once: true, amount: 0.5 }}
                         >
-                            {/* Circle on the timeline */}
                             <div className="hidden md:flex absolute top-1 left-1/2 -ml-4 w-8 h-8 items-center justify-center bg-indigo-500 rounded-full ring-8 ring-[#0D1117]">
                                 <span className="text-xs font-bold">{step.number}</span>
                             </div>
-
                             <div className={`inline-block p-6 bg-gray-900/50 border border-white/10 rounded-2xl ${index % 2 === 1 ? 'md:ml-auto' : 'md:mr-auto'} max-w-sm`}>
                                 <h3 className="text-lg font-bold text-indigo-400 mb-2 md:hidden">Step {step.number}</h3>
                                 <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
@@ -498,7 +618,7 @@ const Testimonials = () => {
 
 
 //================================================================
-// MAIN APP COMPONENT
+// MAIN APP COMPONENT (Unchanged logic, updated CSS and Z-index)
 //================================================================
 const WHATSAPP_NUMBER = "9310739038";
 
@@ -507,6 +627,45 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [favorites, setFavorites] = useState<Set<string>>(() => new Set());
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+  
+  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
+
+  const [showMeteors, setShowMeteors] = useState(true);
+
+  const productSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setProgress(prev => {
+            if (prev >= 100) {
+                clearInterval(interval);
+                setTimeout(() => setLoading(false), 500);
+                return 100;
+            }
+            return prev + 1;
+        });
+    }, 30); 
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY < window.innerHeight / 2) {
+        setShowMeteors(true);
+      } else {
+        setShowMeteors(false);
+      }
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
 
   const total = websites.length;
   const currentWebsite = websites[currentIndex];
@@ -538,10 +697,20 @@ export default function App() {
     }
   };
 
+  const handleBookCall = () => {
+      const message = `Hello Vertex Nexus! I'd like to book a call to discuss your services.`;
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, "_blank");
+  };
+
+  const handleViewProduct = () => {
+    productSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const GlassButton = ({ onClick, children, className, ...props }: any) => (
     <button
       onClick={onClick}
-      className={`pointer-events-auto p-3 bg-gray-500 rounded-full hover:bg-white/10 transition-all z-30 transform hover:scale-110 active:scale-95 border border-white/10 shadow-lg backdrop-blur-md ${className}`}
+      className={`pointer-events-auto p-3 bg-gray-500/50 rounded-full hover:bg-white/10 transition-all z-30 transform hover:scale-110 active:scale-95 border border-white/10 shadow-lg backdrop-blur-md ${className}`}
       {...props}
     >
       {children}
@@ -550,8 +719,101 @@ export default function App() {
 
   return (
     <>
-      <div className="min-h-screen w-full font-sans text-white selection:bg-indigo-500 selection:text-white relative flex flex-col">
-        <MotionBackground />
+      <style>{`
+        /* --- ✨ UPDATED: Meteor Animation CSS for "Dim Universe" Feel ✨ --- */
+        .meteor {
+            position: absolute;
+            opacity: 0;
+            animation: meteor-fall linear infinite;
+        }
+
+        /* The glowing head of the meteor */
+        .meteor::after {
+            content: '';
+            display: block;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background-color: #fff;
+            box-shadow: 
+                0 0 5px 2px rgba(255, 255, 255, 0.2), 
+                0 0 10px 5px rgba(255, 255, 255, 0.1),
+                0 0 15px 7px rgba(168, 85, 247, 0.05); /* subtle purple glow */
+        }
+        
+        /* The tail of the meteor */
+        .meteor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) rotate(-45deg);
+            right: 3px; /* Start just behind the head */
+            width: 250px; /* Tail length */
+            height: 1px;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0.15), transparent);
+        }
+        
+        @keyframes meteor-fall {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-500px, 500px);
+                opacity: 0;
+            }
+        }
+        
+        /* --- Preloader Glitch Animation (Unchanged) --- */
+        .animate-glitch {
+            position: relative;
+            color: #fff;
+            text-shadow: 0 0 1px #fff, 0 0 5px #fff, 0 0 10px #6366f1, 0 0 20px #6366f1;
+        }
+        .animate-glitch::before,
+        .animate-glitch::after {
+            content: var(--glitch-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0D1117;
+            overflow: hidden;
+            clip: rect(0, 900px, 0, 0);
+        }
+        .animate-glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 #ec4899;
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+        .animate-glitch::after {
+            left: -2px;
+            text-shadow: -1px 0 #0ea5e9;
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(42px, 9999px, 44px, 0); } 5% { clip: rect(12px, 9999px, 69px, 0); } 10% { clip: rect(62px, 9999px, 83px, 0); } 15% { clip: rect(31px, 9999px, 57px, 0); } 20% { clip: rect(25px, 9999px, 86px, 0); } 25% { clip: rect(48px, 9999px, 73px, 0); } 30% { clip: rect(80px, 9999px, 49px, 0); } 35% { clip: rect(49px, 9999px, 79px, 0); } 40% { clip: rect(35px, 9999px, 82px, 0); } 45% { clip: rect(87px, 9999px, 43px, 0); } 50% { clip: rect(21px, 9999px, 73px, 0); } 55% { clip: rect(79px, 9999px, 50px, 0); } 60% { clip: rect(20px, 9999px, 60px, 0); } 65% { clip: rect(93px, 9999px, 43px, 0); } 70% { clip: rect(15px, 9999px, 73px, 0); } 75% { clip: rect(63px, 9999px, 33px, 0); } 80% { clip: rect(23px, 9999px, 89px, 0); } 85% { clip: rect(98px, 9999px, 49px, 0); } 90% { clip: rect(10px, 9999px, 94px, 0); } 95% { clip: rect(5px, 9999px, 59px, 0); } 100% { clip: rect(42px, 9999px, 98px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(85px, 9999px, 100px, 0); } 5% { clip: rect(29px, 9999px, 92px, 0); } 10% { clip: rect(78px, 9999px, 15px, 0); } 15% { clip: rect(53px, 9999px, 86px, 0); } 20% { clip: rect(23px, 9999px, 73px, 0); } 25% { clip: rect(10px, 9999px, 64px, 0); } 30% { clip: rect(89px, 9999px, 43px, 0); } 35% { clip: rect(71px, 9999px, 98px, 0); } 40% { clip: rect(29px, 9999px, 80px, 0); } 45% { clip: rect(41px, 9999px, 53px, 0); } 50% { clip: rect(93px, 9999px, 29px, 0); } 55% { clip: rect(13px, 9999px, 83px, 0); } 60% { clip: rect(73px, 9999px, 29px, 0); } 65% { clip: rect(6px, 9999px, 54px, 0); } 70% { clip: rect(89px, 9999px, 38px, 0); } 75% { clip: rect(45px, 9999px, 95px, 0); } 80% { clip: rect(12px, 9999px, 69px, 0); } 85% { clip: rect(58px, 9999px, 21px, 0); } 90% { clip: rect(74px, 9999px, 49px, 0); } 95% { clip: rect(8px, 9999px, 73px, 0); } 100% { clip: rect(20px, 9999px, 82px, 0); }
+        }
+      `}</style>
+
+      <div className="min-h-screen w-full font-sans text-white selection:bg-indigo-500 selection:text-white relative flex flex-col bg-[#0D1117]">
+        <AnimatePresence>
+            {loading && <Preloader progress={progress} />}
+        </AnimatePresence>
+
+        <AnimatePresence>
+            {showMeteors && <MeteorShower />}
+        </AnimatePresence>
+
+        {/* Static background pattern - z-index is lowered to ensure meteors are on top */}
+        <div className="absolute inset-0 -z-20 bg-[radial-gradient(#ffffff11_1px,transparent_1px)] [background-size:16px_16px]"></div>
 
         {/* Header */}
         <header className="sticky top-0 z-40 bg-gray-950/50 backdrop-blur-lg border-b border-white/10">
@@ -568,61 +830,62 @@ export default function App() {
         </header>
 
         <main className="relative z-20 flex-grow">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
-            <div className="relative w-full">
-              <ResponsiveFrame
-                files={sandpackFiles}
-                backgroundImageUrl={currentWebsite?.imagePath}
-              />
-              <div className="absolute top-64 inset-x-0 flex items-center justify-between pointer-events-none px-2 sm:px-4">
-                <GlassButton onClick={goPrev} aria-label="Previous">
-                  <ChevronLeft className="w-5 h-5" />
-                </GlassButton>
-                <GlassButton onClick={goNext} aria-label="Next">
-                  <ChevronRight className="w-5 h-5" />
-                </GlassButton>
-              </div>
-              <GlassButton
-                onClick={() => setIsFullScreen(true)}
-                className="absolute top-4 right-4 !p-2.5"
-                title="Fullscreen"
-              >
-                <Maximize className="w-5 h-5" />
-              </GlassButton>
-            </div>
-          </div>
-
-          <TemplateDetails website={currentWebsite} onBuyNow={handleBuyNow} />
-
-          <div className="mt-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h3 className="text-xl font-bold text-gray-200 mb-4">
-                Browse All Templates
-              </h3>
-              <div className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#0D1117] to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0D1117] to-transparent z-10 pointer-events-none" />
-                <div className="flex gap-4 p-2 pb-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
-                  {websites.map((w, idx) => (
-                    <TemplateThumbnail
-                      key={w.id}
-                      website={w}
-                      onClick={() => setCurrentIndex(idx)}
-                      isActive={currentIndex === idx}
-                      isFavorite={favorites.has(w.id)}
-                      onToggleFav={toggleFav}
-                    />
-                  ))}
+          <HeroWith3DAnimation
+            onViewProductClick={handleViewProduct}
+            onBookCallClick={handleBookCall}
+          />
+          <div ref={productSectionRef} className="pt-16 bg-[#0D1117]">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="relative w-full">
+                  <ResponsiveFrame
+                    files={sandpackFiles}
+                    backgroundImageUrl={currentWebsite?.imagePath}
+                  />
+                  <div className="absolute top-1/2 -translate-y-1/2 inset-x-0 flex items-center justify-between pointer-events-none px-2 sm:px-4">
+                    <GlassButton onClick={goPrev} aria-label="Previous">
+                      <ChevronLeft className="w-5 h-5" />
+                    </GlassButton>
+                    <GlassButton onClick={goNext} aria-label="Next">
+                      <ChevronRight className="w-5 h-5" />
+                    </GlassButton>
+                  </div>
+                  <GlassButton
+                    onClick={() => setIsFullScreen(true)}
+                    className="absolute top-4 right-4 !p-2.5"
+                    title="Fullscreen"
+                  >
+                    <Maximize className="w-5 h-5" />
+                  </GlassButton>
                 </div>
               </div>
-            </div>
+              <TemplateDetails website={currentWebsite} onBuyNow={handleBuyNow} />
+              <div className="mt-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <h3 className="text-xl font-bold text-gray-200 mb-4">
+                    Browse All Templates
+                  </h3>
+                  <div className="relative">
+                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#0D1117] to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0D1117] to-transparent z-10 pointer-events-none" />
+                    <div className="flex gap-4 p-2 pb-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+                      {websites.map((w, idx) => (
+                        <TemplateThumbnail
+                          key={w.id}
+                          website={w}
+                          onClick={() => setCurrentIndex(idx)}
+                          isActive={currentIndex === idx}
+                          isFavorite={favorites.has(w.id)}
+                          onToggleFav={toggleFav}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
           </div>
-
-          {/* ✨ RENDER NEW SECTIONS ✨ */}
           <OurServices />
           <OurProcess />
           <Testimonials />
-
         </main>
         
         {/* Footer */}
@@ -630,17 +893,17 @@ export default function App() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                     <div className="md:col-span-5">
-                         <h4 className="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-sky-400">
-                             Vertex Nexus
-                         </h4>
-                         <p className="text-slate-400 mb-6 max-w-md text-sm">
-                             Build your next-generation website with our AI-powered platform. Choose a stunning template or create something entirely new.
-                         </p>
-                         <div className="flex gap-3">
-                             <a href="#" className="p-3 bg-white/5 rounded-full hover:bg-indigo-600 transition-colors" aria-label="Instagram"><Instagram className="w-5 h-5" /></a>
-                             <a href="#" className="p-3 bg-white/5 rounded-full hover:bg-indigo-600 transition-colors" aria-label="LinkedIn"><Linkedin className="w-5 h-5" /></a>
-                             <a href="#" className="p-3 bg-white/5 rounded-full hover:bg-indigo-600 transition-colors" aria-label="Github"><Github className="w-5 h-5" /></a>
-                         </div>
+                        <h4 className="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-sky-400">
+                           Vertex Nexus
+                        </h4>
+                        <p className="text-slate-400 mb-6 max-w-md text-sm">
+                            Build your next-generation website with our AI-powered platform. Choose a stunning template or create something entirely new.
+                        </p>
+                        <div className="flex gap-3">
+                            <a href="#" className="p-3 bg-white/5 rounded-full hover:bg-indigo-600 transition-colors" aria-label="Instagram"><Instagram className="w-5 h-5" /></a>
+                            <a href="#" className="p-3 bg-white/5 rounded-full hover:bg-indigo-600 transition-colors" aria-label="LinkedIn"><Linkedin className="w-5 h-5" /></a>
+                            <a href="#" className="p-3 bg-white/5 rounded-full hover:bg-indigo-600 transition-colors" aria-label="Github"><Github className="w-5 h-5" /></a>
+                        </div>
                     </div>
                     <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
                         <div>
