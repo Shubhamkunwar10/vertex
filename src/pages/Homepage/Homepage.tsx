@@ -246,8 +246,9 @@ function Shape({ scrollProgress }: { scrollProgress: any }) {
 
   return (
     // 3. Use the dynamic scale state here
-    <mesh ref={meshRef} scale={scale}> 
-      <TorusKnot args={[1, 0.3, 200, 24]}>
+
+    <mesh ref={meshRef} scale={scale} > 
+      <TorusKnot args={[1, 0.3, 200, 24]} >
         <meshStandardMaterial color="#a855f7" wireframe={true} />
       </TorusKnot>
     </mesh>
@@ -667,10 +668,10 @@ export default function App() {
         setProgress(prev => {
             if (prev >= 100) {
                 clearInterval(interval);
-                setTimeout(() => setLoading(false), 500);
+                setTimeout(() => setLoading(false), 50);
                 return 100;
             }
-            return prev + 1;
+            return prev + 8;
         });
     }, 30); 
 
