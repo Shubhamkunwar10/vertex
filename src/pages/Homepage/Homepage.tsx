@@ -602,7 +602,7 @@ const OurProcess = () => {
                             </div>
                             <div className={`inline-block p-6 bg-gray-900/50 border border-white/10 rounded-2xl ${index % 2 === 1 ? 'md:ml-auto' : 'md:mr-auto'} max-w-sm`}>
                                 <h3 className="text-lg font-bold text-indigo-400 mb-2 md:hidden">Step {step.number}</h3>
-                                <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
+                                <h3 className="text-xl font-semibold text-white mb-3 mt-6">{step.title}</h3>
                                 <p className="text-gray-400 text-sm">{step.description}</p>
                             </div>
                         </motion.div>
